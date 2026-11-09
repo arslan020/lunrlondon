@@ -4,14 +4,13 @@ import { faqGroups } from '../data/faqs'
 import { siteConfig } from '../siteConfig'
 
 const fieldClass =
-  'mt-1.5 w-full rounded-xl border border-white/15 bg-transparent px-4 py-3 text-base text-white outline-none placeholder:text-neutral-500 focus:border-white/40'
+  'mt-1.5 w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-base text-white outline-none placeholder:text-neutral-500 focus:border-white/30'
 
 function digits(value: string) {
   return value.replace(/[^\d+]/g, '')
 }
 
 function Contact() {
-  const [enquiryOpen, setEnquiryOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [query, setQuery] = useState('')
   const [group, setGroup] = useState('All')
@@ -23,13 +22,13 @@ function Contact() {
   const whatsappHref = phone ? `https://wa.me/${digits(phone).replace(/^\+/, '')}` : ''
   const emailHref = siteConfig.email ? `mailto:${siteConfig.email}` : ''
   const address = [siteConfig.address.line1, siteConfig.address.line2].filter(Boolean).join(', ')
-  const showAddress = Boolean(address) && !address.startsWith('Your Business')
 
   const channels = [
-    phoneHref ? { label: 'Call', href: phoneHref, icon: 'phone' as const } : null,
-    whatsappHref ? { label: 'WhatsApp', href: whatsappHref, icon: 'whatsapp' as const } : null,
-    emailHref ? { label: 'Email', href: emailHref, icon: 'email' as const } : null,
+    phoneHref ? { label: 'Call', detail: phone, href: phoneHref, icon: 'phone' as const } : null,
+    whatsappHref ? { label: 'WhatsApp', detail: 'Message the team', href: whatsappHref, icon: 'whatsapp' as const } : null,
+    emailHref ? { label: 'Email', detail: siteConfig.email, href: emailHref, icon: 'email' as const } : null,
   ].filter((item) => item != null)
+  const mapsHref = address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}` : ''
 
   const groups = ['All', ...faqGroups.map((item) => item.groupTitle)]
 
@@ -47,10 +46,7 @@ function Contact() {
   const visible = showAll ? questions : questions.slice(0, 4)
 
   const openEnquiry = () => {
-    setEnquiryOpen(true)
-    requestAnimationFrame(() => {
-      document.getElementById('enquiry')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    })
+    document.getElementById('enquiry')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -60,16 +56,16 @@ function Contact() {
 
   return (
     <div className="bg-black text-white">
-      <section className="px-4 pb-6 pt-28 sm:px-6">
-        <div className="mx-auto max-w-[720px]">
+      <section className="px-4 pb-4 pt-28 sm:px-6">
+        <div className="mx-auto max-w-content text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-400">Get in touch</p>
-          <h1 className="mt-4 max-w-[16ch] text-[2.15rem] font-medium leading-[1.08] tracking-tight text-white sm:text-5xl">
+          <h1 className="mx-auto mt-4 max-w-[14ch] text-[2.35rem] font-medium leading-[1.08] tracking-tight text-white sm:text-6xl">
             Someone here when the journey needs a person.
           </h1>
-          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-neutral-300">
+          <p className="mx-auto mt-5 max-w-xl text-[15px] leading-relaxed text-neutral-300 sm:text-base">
             Speak with {siteConfig.brandName} about a new journey, a change to a booking, or a plan that needs more than a form.
           </p>
-          <div className="mt-6 flex flex-col items-start gap-3">
+          <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               to="/book"
               className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-neutral-950"
@@ -80,7 +76,7 @@ function Contact() {
             <button
               type="button"
               onClick={openEnquiry}
-              className="inline-flex items-center gap-2 rounded-full border border-white/35 px-5 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white"
+              className="inline-flex items-center gap-2 rounded-full border border-white/40 px-5 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white"
             >
               Send an enquiry
               <Arrow />
@@ -89,90 +85,93 @@ function Contact() {
           <img
             src="/images/chauffeur.jpg"
             alt=""
-            className="mt-8 h-52 w-full rounded-2xl object-cover object-[center_40%] sm:h-72"
+            className="mt-10 h-56 w-full rounded-2xl object-cover object-[center_30%] sm:h-[420px]"
           />
         </div>
       </section>
 
-      <section className="px-4 py-8 sm:px-6">
-        <div className="mx-auto max-w-[720px]">
-          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-neutral-400">
+      <section className="px-4 py-10 sm:px-6">
+        <div className="mx-auto max-w-content">
+          <nav aria-label="Breadcrumb" className="mb-5 text-sm text-neutral-500">
             <Link to="/" className="hover:text-white">
               Home
             </Link>
             <span className="px-2">›</span>
-            <span className="text-neutral-200">Contact</span>
+            <span className="text-neutral-300">Contact</span>
           </nav>
 
-          <div id="enquiry" className="scroll-mt-28 rounded-2xl border border-white/10 bg-[#121212] p-5 sm:p-7">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Get in touch</p>
-            <h2 className="mt-3 text-[1.7rem] font-semibold uppercase leading-[1.05] tracking-tight sm:text-4xl">
-              Talk to a person, any hour.
-            </h2>
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-neutral-300">
-              See a fare online, and reach the team when you want to talk the journey through.
-            </p>
-            <Link to="/book" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-white">
-              Book now / Get quote
-              <span aria-hidden="true">›</span>
-            </Link>
+          <div id="enquiry" className="scroll-mt-28 rounded-[1.25rem] border border-white/10 bg-[#111111] p-5 sm:p-8 lg:p-10">
+            <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Get in touch</p>
+                <h2 className="mt-3 text-[1.85rem] font-semibold uppercase leading-[1.02] tracking-tight sm:text-[2.6rem]">
+                  Talk to a person, any hour.
+                </h2>
+                <p className="mt-4 max-w-md text-sm leading-relaxed text-neutral-300">
+                  See a fare online, and reach the team when you want to talk the journey through.
+                </p>
+                <Link to="/book" className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-white">
+                  Book now / Get quote
+                  <span aria-hidden="true">›</span>
+                </Link>
 
-            {channels.length > 0 && (
-              <div className={`mt-5 grid gap-2 ${channels.length === 1 ? 'grid-cols-1' : channels.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-                {channels.map((channel) => (
-                  <a
-                    key={channel.label}
-                    href={channel.href}
-                    className="flex flex-col items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#1b1b1b] px-2 py-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-white"
-                  >
-                    <ChannelIcon name={channel.icon} />
-                    {channel.label}
-                  </a>
-                ))}
+                {channels.length > 0 && (
+                  <div className="mt-6 border-t border-white/10">
+                    {channels.map((channel) => (
+                      <a
+                        key={channel.label}
+                        href={channel.href}
+                        className="flex items-center gap-4 border-b border-white/10 py-4"
+                      >
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15">
+                          <ChannelIcon name={channel.icon} />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[11px] font-semibold uppercase tracking-[0.16em]">{channel.label}</span>
+                          <span className="mt-0.5 block truncate text-sm text-neutral-400">{channel.detail}</span>
+                        </span>
+                        <span className="text-neutral-500" aria-hidden="true">
+                          ›
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
 
-            <button
-              type="button"
-              onClick={() => setEnquiryOpen((open) => !open)}
-              className="mt-3 flex w-full items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-left text-sm text-neutral-200"
-              aria-expanded={enquiryOpen}
-            >
-              {enquiryOpen ? 'Close enquiry' : 'Send an enquiry'}
-              <span className={`text-lg leading-none ${enquiryOpen ? '' : 'rotate-180'}`}>⌃</span>
-            </button>
-
-            {enquiryOpen && (
-              <div className="pt-5">
+              <div className="lg:border-l lg:border-white/10 lg:pl-12">
                 {submitted ? (
-                  <div>
+                  <div className="py-6">
                     <h3 className="text-lg font-semibold">Message received</h3>
                     <p className="mt-2 text-sm leading-relaxed text-neutral-300">
                       Thank you. A member of the team will come back to you shortly.
                     </p>
                   </div>
                 ) : (
-                  <form onSubmit={submit} className="space-y-4">
-                    <h3 className="text-lg font-semibold">How can we help?</h3>
-                    <label className="block text-sm font-medium">
-                      Name <span className="text-neutral-400">*</span>
-                      <input required name="name" placeholder="Your name" className={fieldClass} />
-                    </label>
-                    <label className="block text-sm font-medium">
-                      Email <span className="text-neutral-400">*</span>
-                      <input required type="email" name="email" placeholder="your@email.com" className={fieldClass} />
-                    </label>
-                    <label className="block text-sm font-medium">
+                  <form onSubmit={submit}>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Send an enquiry</p>
+                    <h3 className="mt-2 text-xl font-semibold">How can we help?</h3>
+                    <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                      <label className="block text-sm font-medium">
+                        Name <span className="text-neutral-400">*</span>
+                        <input required name="name" placeholder="Your name" className={fieldClass} />
+                      </label>
+                      <label className="block text-sm font-medium">
+                        Email <span className="text-neutral-400">*</span>
+                        <input required type="email" name="email" placeholder="your@email.com" className={fieldClass} />
+                      </label>
+                    </div>
+                    <label className="mt-4 block text-sm font-medium">
                       Phone <span className="font-normal text-neutral-400">(optional)</span>
                       <input type="tel" name="phone" placeholder="Your phone number" className={fieldClass} />
                     </label>
-                    <label className="block text-sm font-medium">
+                    <label className="mt-4 block text-sm font-medium">
                       Message <span className="text-neutral-400">*</span>
                       <textarea required name="message" rows={4} placeholder="How can we help you?" className={fieldClass} />
                     </label>
                     <button
                       type="submit"
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white py-3 text-sm font-medium text-neutral-950"
+                      className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-neutral-950"
                     >
                       <SendIcon />
                       Send message
@@ -180,41 +179,59 @@ function Contact() {
                   </form>
                 )}
               </div>
-            )}
+            </div>
           </div>
 
-          {showAddress && <p className="mt-4 text-center text-xs leading-relaxed text-neutral-400">{address}</p>}
+          {address && <p className="mt-6 text-center text-xs leading-relaxed text-neutral-500">{address}</p>}
         </div>
       </section>
 
-      <section className="px-4 py-10 sm:px-6">
-        <div className="mx-auto max-w-[720px]">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-400">Plan the enquiry</p>
-          <h2 className="mt-3 text-[2rem] font-medium leading-[1.1] tracking-tight sm:text-5xl">
-            A clear brief.
-            <br />
-            A calmer arrival.
-          </h2>
-          <img src="/images/airport-arrival.jpg" alt="" className="mt-6 h-52 w-full rounded-2xl object-cover sm:h-80" />
-          <p className="mt-5 text-sm leading-relaxed text-neutral-300">
-            A few details help us recommend the right vehicle and confirm the journey clearly.
-          </p>
-          <ol className="mt-6 divide-y divide-white/10 border-t border-white/10">
-            {steps.map((step) => (
-              <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-3 py-5">
-                <span className="pt-0.5 text-sm text-neutral-500">{step.number}</span>
-                <div>
-                  <h3 className="font-semibold">{step.title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-neutral-400">{step.text}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-          {phoneHref && (
-            <p className="text-sm text-neutral-300">
-              Need an answer now? <a href={phoneHref} className="font-semibold text-white">Call {phone}</a>.
+      <section className="px-4 py-12 sm:px-6">
+        <div className="mx-auto grid max-w-content items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] lg:gap-16">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-400">Plan the enquiry</p>
+            <h2 className="mt-3 max-w-[12ch] text-[2rem] font-medium leading-[1.08] tracking-tight sm:text-5xl">
+              A clear brief. A calmer arrival.
+            </h2>
+            <img src="/images/airport-arrival.jpg" alt="" className="mt-6 h-56 w-full rounded-2xl object-cover sm:h-72" />
+            <p className="mt-5 max-w-xl text-sm leading-relaxed text-neutral-300">
+              A few details help us recommend the right vehicle and confirm the journey clearly.
             </p>
-          )}
+            <ol className="mt-4">
+              {steps.map((step) => (
+                <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-3 border-t border-white/10 py-5">
+                  <span className="pt-0.5 text-sm text-neutral-500">{step.number}</span>
+                  <div>
+                    <h3 className="font-semibold">{step.title}</h3>
+                    <p className="mt-1 max-w-xl text-sm leading-relaxed text-neutral-400">{step.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            {phoneHref && (
+              <p className="text-sm text-neutral-300">
+                Need an answer now?{' '}
+                <a href={phoneHref} className="font-semibold text-white">
+                  Call {phone}
+                </a>
+                .
+              </p>
+            )}
+          </div>
+
+          <aside className="rounded-[1.25rem] border border-white/10 bg-[#141414] p-6 sm:p-7 lg:mt-16">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-neutral-300">
+              <PinIcon />
+            </span>
+            <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Our office</p>
+            <p className="mt-3 text-xl font-semibold leading-snug">{address}</p>
+            {mapsHref && (
+              <a href={mapsHref} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold">
+                Get directions
+                <span aria-hidden="true">›</span>
+              </a>
+            )}
+          </aside>
         </div>
       </section>
 
@@ -320,6 +337,15 @@ function SendIcon() {
   return (
     <svg viewBox="0 0 16 16" className="h-4 w-4" aria-hidden="true">
       <path d="M2 8.5 14 2l-4.5 12-2-5.2L2 8.5Z" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function PinIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+      <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="12" cy="10" r="2.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
     </svg>
   )
 }
