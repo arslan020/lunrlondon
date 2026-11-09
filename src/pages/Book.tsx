@@ -18,7 +18,7 @@ const tripTypes: { id: TripType; label: string }[] = [
 const fareCell = (amount?: number) => (amount != null ? formatPrice(amount) : '—')
 
 const fieldClass =
-  'w-full rounded-md border border-neutral-300 bg-white px-3 py-3 text-base text-neutral-900 outline-none focus:border-neutral-900'
+  'w-full min-w-0 max-w-full rounded-md border border-neutral-300 bg-white px-3 py-3 text-base text-neutral-900 outline-none focus:border-neutral-900'
 
 function Book() {
   const [step, setStep] = useState<1 | 2>(1)
@@ -55,8 +55,8 @@ function Book() {
 
   return (
     <section className="bg-black px-4 pb-16 pt-28 sm:px-6 md:pt-32">
-      <div className="mx-auto grid max-w-content items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
-        <div className="rounded-2xl bg-white p-4 text-neutral-900 shadow-2xl sm:p-6" style={{ colorScheme: 'light' }}>
+      <div className="mx-auto grid w-full min-w-0 max-w-content items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
+        <div className="min-w-0 rounded-2xl bg-white p-4 text-neutral-900 shadow-2xl sm:p-6" style={{ colorScheme: 'light' }}>
           {submitted ? (
             <div className="px-2 py-10 text-center">
               <h1 className="font-serif text-4xl text-neutral-900">Request received</h1>
@@ -68,13 +68,13 @@ function Book() {
             </div>
           ) : (
             <>
-              <ol className="mb-6 flex items-center gap-3 text-sm font-semibold">
-                <li className="flex items-center gap-2 text-neutral-900">
+              <ol className="mb-6 flex items-center gap-2 text-xs font-semibold sm:gap-3 sm:text-sm">
+                <li className="flex min-w-0 items-center gap-2 text-neutral-900">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-900 text-xs text-white">1</span>
                   Journey Details
                 </li>
                 <span className="h-px flex-1 bg-neutral-200" />
-                <li className={`flex items-center gap-2 ${step === 2 ? 'text-neutral-900' : 'text-neutral-400'}`}>
+                <li className={`flex shrink-0 items-center gap-2 ${step === 2 ? 'text-neutral-900' : 'text-neutral-400'}`}>
                   <span
                     className={`flex h-7 w-7 items-center justify-center rounded-full text-xs ${
                       step === 2 ? 'bg-neutral-900 text-white' : 'border border-neutral-300'
@@ -88,13 +88,13 @@ function Book() {
 
               {step === 1 ? (
                 <form onSubmit={goNext} className="space-y-4">
-                  <div className="grid grid-cols-3 border-b border-neutral-200">
+                  <div className="grid min-w-0 grid-cols-3 border-b border-neutral-200">
                     {tripTypes.map((type) => (
                       <button
                         key={type.id}
                         type="button"
                         onClick={() => setTripType(type.id)}
-                        className={`px-1 pb-3 text-center text-xs font-semibold sm:text-sm ${
+                        className={`min-w-0 whitespace-normal px-1 pb-3 text-center text-[11px] font-semibold leading-tight sm:text-sm ${
                           tripType === type.id ? 'border-b-2 border-[#c4a15a] text-neutral-900' : 'text-neutral-500'
                         }`}
                       >
@@ -140,7 +140,7 @@ function Book() {
                     </label>
                   )}
 
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid min-w-0 gap-4 sm:grid-cols-2">
                     <label className="block text-sm font-medium">
                       Select Date
                       <input required type="date" value={date} onChange={(event) => setDate(event.target.value)} className={`${fieldClass} mt-1`} />
@@ -193,18 +193,18 @@ function Book() {
                           key={vehicle.id}
                           type="button"
                           onClick={() => setVehicleId(vehicle.id)}
-                          className={`flex items-center gap-3 rounded-xl border p-3 text-left ${
+                          className={`flex min-w-0 items-center gap-3 rounded-xl border p-3 text-left ${
                             selected ? 'border-neutral-900 bg-neutral-50' : 'border-neutral-200'
                           }`}
                         >
-                          <img src={vehicle.image} alt="" className="h-16 w-20 shrink-0 rounded-lg object-cover" />
+                          <img src={vehicle.image} alt="" className="h-14 w-16 shrink-0 rounded-lg object-cover sm:h-16 sm:w-20" />
                           <span className="min-w-0 flex-1">
                             <span className="block font-semibold">{vehicle.shortName}</span>
                             <span className="block text-xs text-neutral-500">
                               {vehicle.seats} · {formatPrice(vehicle.hourly)}/hour
                             </span>
                           </span>
-                          <span className="font-serif text-2xl">{quote?.amount != null ? formatPrice(quote.amount) : 'Quote'}</span>
+                          <span className="shrink-0 font-serif text-xl sm:text-2xl">{quote?.amount != null ? formatPrice(quote.amount) : 'Quote'}</span>
                         </button>
                       )
                     })}
@@ -212,7 +212,7 @@ function Book() {
 
                   {selectedQuote && <p className="text-sm text-neutral-600">{selectedQuote.summary}</p>}
 
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid min-w-0 gap-4 sm:grid-cols-2">
                     <label className="block text-sm font-medium">
                       Your Name
                       <input required value={name} onChange={(event) => setName(event.target.value)} className={`${fieldClass} mt-1`} />
@@ -244,7 +244,7 @@ function Book() {
           )}
         </div>
 
-        <aside className="rounded-2xl border border-white/10 bg-[#141413] p-5 text-white sm:p-6">
+        <aside className="min-w-0 rounded-2xl border border-white/10 bg-[#141413] p-5 text-white sm:p-6">
           <h2 className="font-serif text-3xl">Price list</h2>
           <p className="mt-2 text-sm leading-relaxed text-neutral-400">
             Hourly hire is charged per hour. Airport fares are fixed from central London. A return booking doubles the fare.
@@ -261,8 +261,23 @@ function Book() {
           </ul>
 
           <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-brand-primary">Airports</h3>
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full min-w-[560px] text-left text-sm">
+          <ul className="mt-3 space-y-3 md:hidden">
+            {airports.map((airport) => (
+              <li key={airport.id} className="rounded-xl border border-white/10 px-3 py-3">
+                <p className="font-semibold">{airport.name}</p>
+                <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
+                  {vehicles.map((vehicle) => (
+                    <div key={vehicle.id} className="flex min-w-0 items-baseline justify-between gap-2">
+                      <dt className="truncate text-neutral-400">{vehicle.shortName}</dt>
+                      <dd className="shrink-0 font-semibold">{fareCell(airport.prices[vehicle.id])}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-3 hidden overflow-x-auto md:block">
+            <table className="w-full text-left text-sm">
               <thead className="text-xs uppercase tracking-wide text-neutral-400">
                 <tr>
                   <th className="py-2 pr-3 font-medium">Airport</th>
