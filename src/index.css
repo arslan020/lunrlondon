@@ -17,6 +17,17 @@
   }
 }
 
+input[type='date'],
+input[type='time'] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 body {
   margin: 0;
   font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;

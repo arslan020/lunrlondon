@@ -68,10 +68,10 @@ function Book() {
             </div>
           ) : (
             <>
-              <ol className="mb-6 flex items-center gap-2 text-xs font-semibold sm:gap-3 sm:text-sm">
+              <ol className="mb-6 flex w-full min-w-0 items-center gap-2 text-xs font-semibold sm:gap-3 sm:text-sm">
                 <li className="flex min-w-0 items-center gap-2 text-neutral-900">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-900 text-xs text-white">1</span>
-                  Journey Details
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xs text-white">1</span>
+                  <span className="truncate">Journey Details</span>
                 </li>
                 <span className="h-px flex-1 bg-neutral-200" />
                 <li className={`flex shrink-0 items-center gap-2 ${step === 2 ? 'text-neutral-900' : 'text-neutral-400'}`}>
@@ -140,14 +140,14 @@ function Book() {
                     </label>
                   )}
 
-                  <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-                    <label className="block text-sm font-medium">
+                  <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="block min-w-0 overflow-hidden text-sm font-medium">
                       Select Date
-                      <input required type="date" value={date} onChange={(event) => setDate(event.target.value)} className={`${fieldClass} mt-1`} />
+                      <input required type="date" value={date} onChange={(event) => setDate(event.target.value)} className={`${fieldClass} mt-1 h-12`} />
                     </label>
-                    <label className="block text-sm font-medium">
+                    <label className="block min-w-0 overflow-hidden text-sm font-medium">
                       Select Time
-                      <input required type="time" value={time} onChange={(event) => setTime(event.target.value)} className={`${fieldClass} mt-1`} />
+                      <input required type="time" value={time} onChange={(event) => setTime(event.target.value)} className={`${fieldClass} mt-1 h-12`} />
                     </label>
                   </div>
 
