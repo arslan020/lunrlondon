@@ -25,7 +25,7 @@ function CTASection({ heading, highlight, text, buttonLabel, buttonTo = '/contac
     <section className="py-10 md:py-16">
       <div className="mx-auto max-w-content px-4 sm:px-6">
         <div className="relative overflow-hidden rounded-[1rem] bg-brand-secondary px-5 py-10 sm:px-10 sm:py-14 lg:px-14">
-          <UKMapGraphic className="pointer-events-none absolute -right-8 top-1/2 hidden h-[130%] w-auto max-w-[58%] -translate-y-1/2 object-contain sm:block" />
+          <UKMapGraphic className="pointer-events-none absolute -right-4 top-1/2 h-[108%] w-auto max-w-[64%] -translate-y-1/2 object-contain sm:-right-8 sm:h-[130%] sm:max-w-[58%]" />
           <div className="relative max-w-xl">
             <h2 className="font-serif text-[clamp(2rem,1.4rem+2vw,3rem)] font-medium leading-tight text-brand-dark">
               {renderedHeading}

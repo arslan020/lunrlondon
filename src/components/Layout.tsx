@@ -34,7 +34,7 @@ function revealOnScroll() {
   groups.forEach((items) => {
     items.forEach((node, index) => {
       node.classList.add('scroll-reveal')
-      node.style.transitionDelay = `${Math.min(index, 8) * 0.1}s`
+      node.style.transitionDelay = `${Math.min(index, 8) * 0.16}s`
     })
   })
 
