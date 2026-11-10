@@ -76,3 +76,74 @@ h1, h2, h3, h4 {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+.contact-card {
+  --contact-pointer-x: 50%;
+  --contact-pointer-y: 50%;
+  --contact-pointer-active: 0;
+}
+
+.contact-card::before,
+.contact-card::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  content: '';
+  opacity: var(--contact-pointer-active);
+}
+
+.contact-card::before {
+  background: radial-gradient(
+    ellipse 24rem 18rem at var(--contact-pointer-x) var(--contact-pointer-y),
+    rgb(255 255 255 / 16%),
+    rgb(255 255 255 / 6%) 36%,
+    transparent 72%
+  );
+  transition: opacity 0.22s;
+}
+
+.contact-card::after {
+  padding: 1px;
+  background: radial-gradient(
+    circle 10rem at var(--contact-pointer-x) var(--contact-pointer-y),
+    rgb(255 255 255 / 80%),
+    rgb(255 255 255 / 22%) 42%,
+    transparent 74%
+  );
+  transition: opacity 0.18s;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.contact-channel {
+  transition:
+    background-color 0.2s,
+    box-shadow 0.22s,
+    transform 0.22s;
+}
+
+.contact-channel-arrow {
+  transition: transform 0.18s;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .contact-channel:hover,
+  .contact-channel:focus-visible {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    transform: translateY(-3px) scale(1.025);
+  }
+
+  .contact-channel:hover .contact-channel-arrow,
+  .contact-channel:focus-visible .contact-channel-arrow {
+    transform: translateX(0.18rem);
+  }
+}

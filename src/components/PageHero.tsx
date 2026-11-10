@@ -13,6 +13,9 @@ interface PageHeroProps {
   video?: string
   image?: string
   imagePosition?: string
+  videoClassName?: string
+  contentClassName?: string
+  scrim?: 'default' | 'soft'
 }
 
 function PageHero({
@@ -27,6 +30,9 @@ function PageHero({
   video,
   image,
   imagePosition = 'object-center',
+  videoClassName = '',
+  contentClassName = 'pb-12 sm:pb-16 lg:pb-20',
+  scrim = 'default',
 }: PageHeroProps) {
   let renderedHeading: ReactNode = heading
   if (highlight && heading.includes(highlight)) {
@@ -44,7 +50,7 @@ function PageHero({
     <section className="relative flex min-h-[100svh] items-end overflow-hidden bg-neutral-950">
       {video ? (
         <video
-          className="absolute inset-0 h-full w-full object-cover"
+          className={`absolute inset-0 h-full w-full object-cover ${videoClassName}`}
           src={video}
           poster={image || '/images/hero.jpg'}
           autoPlay
@@ -53,14 +59,18 @@ function PageHero({
           playsInline
         />
       ) : image ? (
-        <img src={image} alt="" className={`absolute inset-0 h-full w-full object-cover ${imagePosition}`} />
+        <img src={image} alt="" className={`absolute inset-0 h-full w-full object-cover brightness-110 ${imagePosition}`} />
       ) : (
-        <img src="/images/hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <img src="/images/hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover brightness-110" />
       )}
-      <div className="absolute inset-0 bg-black/45" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/25" />
+      <div className={`absolute inset-0 ${scrim === 'soft' ? 'bg-black/10' : 'bg-black/25'}`} />
+      <div
+        className={`absolute inset-0 bg-gradient-to-t ${
+          scrim === 'soft' ? 'from-black/35 via-black/10 to-transparent' : 'from-black/75 via-black/30 to-black/10'
+        }`}
+      />
 
-      <div className="relative z-10 mx-auto w-full max-w-content px-4 pb-12 pt-32 sm:px-6 sm:pb-16 lg:pb-20">
+      <div className={`relative z-10 mx-auto w-full max-w-content px-4 pt-32 sm:px-6 ${contentClassName}`}>
         <div className="max-w-2xl text-left">
           {eyebrow && (
             <span className="mb-4 block text-[11px] font-semibold uppercase tracking-[0.25em] text-brand-primary">

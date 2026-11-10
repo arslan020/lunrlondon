@@ -1,10 +1,10 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useMemo, useRef, useState, type FormEvent, type PointerEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { faqGroups } from '../data/faqs'
 import { siteConfig } from '../siteConfig'
 
 const fieldClass =
-  'mt-1.5 w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-base text-white outline-none placeholder:text-neutral-500 focus:border-white/30'
+  'mt-1.5 w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-base text-white outline-none placeholder:text-neutral-500 transition-[border-color,background-color,box-shadow] duration-200 hover:border-white/35 hover:bg-white/10 focus:border-white/45 focus:bg-white/10 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.08)]'
 
 function digits(value: string) {
   return value.replace(/[^\d+]/g, '')
@@ -16,6 +16,20 @@ function Contact() {
   const [group, setGroup] = useState('All')
   const [showAll, setShowAll] = useState(false)
   const [openKey, setOpenKey] = useState<string | null>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  const moveGlow = (event: PointerEvent<HTMLDivElement>) => {
+    const card = cardRef.current
+    if (!card) return
+    const rect = card.getBoundingClientRect()
+    card.style.setProperty('--contact-pointer-x', `${event.clientX - rect.left}px`)
+    card.style.setProperty('--contact-pointer-y', `${event.clientY - rect.top}px`)
+    card.style.setProperty('--contact-pointer-active', '1')
+  }
+
+  const hideGlow = () => {
+    cardRef.current?.style.setProperty('--contact-pointer-active', '0')
+  }
 
   const phone = siteConfig.phone || siteConfig.mobile
   const phoneHref = phone ? `tel:${digits(phone)}` : ''
@@ -24,10 +38,10 @@ function Contact() {
   const address = [siteConfig.address.line1, siteConfig.address.line2].filter(Boolean).join(', ')
 
   const channels = [
-    phoneHref ? { label: 'Call', detail: phone, href: phoneHref, icon: 'phone' as const } : null,
-    whatsappHref ? { label: 'WhatsApp', detail: 'Message the team', href: whatsappHref, icon: 'whatsapp' as const } : null,
-    emailHref ? { label: 'Email', detail: siteConfig.email, href: emailHref, icon: 'email' as const } : null,
-  ].filter((item) => item != null)
+    { label: 'Call', detail: phone || 'Number coming soon', href: phoneHref, icon: 'phone' as const },
+    { label: 'WhatsApp', detail: phone ? 'Message the team' : 'Number coming soon', href: whatsappHref, icon: 'whatsapp' as const },
+    { label: 'Email', detail: siteConfig.email || 'Email coming soon', href: emailHref, icon: 'email' as const },
+  ]
   const mapsHref = address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}` : ''
 
   const groups = ['All', ...faqGroups.map((item) => item.groupTitle)]
@@ -100,8 +114,14 @@ function Contact() {
             <span className="text-neutral-300">Contact</span>
           </nav>
 
-          <div id="enquiry" className="scroll-mt-28 rounded-[1.25rem] border border-white/10 bg-[#111111] p-5 sm:p-8 lg:p-10">
-            <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
+          <div
+            id="enquiry"
+            ref={cardRef}
+            onPointerMove={moveGlow}
+            onPointerLeave={hideGlow}
+            className="contact-card relative scroll-mt-28 overflow-hidden rounded-[1.25rem] border border-white/10 bg-[#111111] p-5 sm:p-8 lg:p-10"
+          >
+            <div className="relative z-[1] grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Get in touch</p>
                 <h2 className="mt-3 text-[1.85rem] font-semibold uppercase leading-[1.02] tracking-tight sm:text-[2.6rem]">
@@ -115,28 +135,37 @@ function Contact() {
                   <span aria-hidden="true">›</span>
                 </Link>
 
-                {channels.length > 0 && (
-                  <div className="mt-6 border-t border-white/10">
-                    {channels.map((channel) => (
-                      <a
-                        key={channel.label}
-                        href={channel.href}
-                        className="flex items-center gap-4 border-b border-white/10 py-4"
-                      >
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15">
-                          <ChannelIcon name={channel.icon} />
-                        </span>
+                <div className="mt-6 border-t border-white/10">
+                  {channels.map((channel) => {
+                    const row = (
+                      <>
+                        <ChannelIcon name={channel.icon} />
                         <span className="min-w-0 flex-1">
                           <span className="block text-[11px] font-semibold uppercase tracking-[0.16em]">{channel.label}</span>
                           <span className="mt-0.5 block truncate text-sm text-neutral-400">{channel.detail}</span>
                         </span>
-                        <span className="text-neutral-500" aria-hidden="true">
+                        <span className="contact-channel-arrow text-neutral-500" aria-hidden="true">
                           ›
                         </span>
+                      </>
+                    )
+                    const rowClass = 'contact-channel flex items-center gap-4 rounded-lg border-b border-white/10 px-2 py-4'
+                    return channel.href ? (
+                      <a
+                        key={channel.label}
+                        href={channel.href}
+                        className={rowClass}
+                        {...(channel.href.startsWith('http') ? { target: '_blank', rel: 'noreferrer' } : {})}
+                      >
+                        {row}
                       </a>
-                    ))}
-                  </div>
-                )}
+                    ) : (
+                      <div key={channel.label} className={rowClass}>
+                        {row}
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
 
               <div className="lg:border-l lg:border-white/10 lg:pl-12">
@@ -193,7 +222,7 @@ function Contact() {
             <h2 className="mt-3 max-w-[12ch] text-[2rem] font-medium leading-[1.08] tracking-tight sm:text-5xl">
               A clear brief. A calmer arrival.
             </h2>
-            <img src="/images/airport-arrival.jpg" alt="" className="mt-6 h-56 w-full rounded-2xl object-cover sm:h-72" />
+            <img src="/images/contact-brief.jpg" alt="" className="mt-6 h-56 w-full rounded-2xl object-cover object-center sm:h-72" />
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-neutral-300">
               A few details help us recommend the right vehicle and confirm the journey clearly.
             </p>
@@ -241,7 +270,7 @@ function Contact() {
           <h2 className="mt-3 text-[1.7rem] font-semibold uppercase leading-[1.05] tracking-tight sm:text-4xl">
             A few things you may want to know first.
           </h2>
-          <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
+          <div className="scrollbar-none mt-5 flex gap-2 overflow-x-auto">
             {groups.map((item) => (
               <button
                 key={item}
@@ -351,25 +380,37 @@ function PinIcon() {
 }
 
 function ChannelIcon({ name }: { name: 'phone' | 'whatsapp' | 'email' }) {
-  if (name === 'whatsapp') {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-[#25D366]" aria-hidden="true">
-        <path d="M12 3.2A8.7 8.7 0 0 0 4.4 16.3L3.2 21l4.8-1.2A8.7 8.7 0 1 0 12 3.2Zm4.8 12.3c-.2.6-1.2 1.1-1.6 1.1-.4.1-.9.2-2.6-.6-2.2-.9-3.6-3.1-3.7-3.3-.1-.2-1-1.3-1-2.5s.6-1.8.9-2c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.6.8 2 .8 2.1.1.2 0 .3-.1.5l-.3.4c-.1.2-.3.3-.1.6.2.3.7 1.1 1.5 1.8.9.8 1.7 1 2 .1.2-.1.4-.2.6-.1l1.5.7c.2.1.4.2.4.3.1.3 0 .8-.2 1.1Z" />
-      </svg>
-    )
-  }
-  if (name === 'email') {
-    return (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-        <rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" strokeWidth="1.6" />
-        <path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" strokeWidth="1.6" />
-      </svg>
-    )
-  }
   return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-      <path d="M8 4h3l1 4-2 1a12 12 0 0 0 5 5l1-2 4 1v3c0 1-1 2-2 2A15 15 0 0 1 6 6c0-1 1-2 2-2Z" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-    </svg>
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/[0.07]">
+      {name === 'phone' && (
+        <svg viewBox="0 0 24 24" className="h-[17px] w-[17px]" fill="none" aria-hidden="true">
+          <path
+            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.69 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.33 1.84.56 2.8.69A2 2 0 0 1 22 16.92Z"
+            stroke="#58A9FF"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.65"
+          />
+        </svg>
+      )}
+      {name === 'whatsapp' && (
+        <svg viewBox="0 0 24 24" className="h-[17px] w-[17px]" aria-hidden="true">
+          <path
+            fill="#25D366"
+            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.148-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.075-.792.372-.272.297-1.04 1.016-1.04 2.479s1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.981.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884a9.82 9.82 0 0 1 7.021 2.91 9.82 9.82 0 0 1 2.9 7.025c-.003 5.45-4.437 9.884-9.884 9.884m8.413-18.297A11.8 11.8 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.88 11.88 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.82 11.82 0 0 0 20.52 3.49Z"
+          />
+        </svg>
+      )}
+      {name === 'email' && (
+        <svg viewBox="0 0 24 24" className="h-[17px] w-[17px]" aria-hidden="true">
+          <path fill="#4285F4" d="M1.636 18.727h3.637V9.91L.52 6.345v11.473c0 .502.407.909.91.909h.206Z" />
+          <path fill="#34A853" d="M18.727 18.727h3.637c.502 0 .909-.407.909-.909V6.345L18.727 9.91v8.817Z" />
+          <path fill="#EA4335" d="M18.727 4.25v5.66l4.546-3.565V5.16c0-1.124-1.283-1.766-2.182-1.091L18.727 4.25Z" />
+          <path fill="#FBBC04" d="M5.273 9.91V4.25L12 9.295l6.727-5.046v5.66L12 14.956 5.273 9.91Z" />
+          <path fill="#C5221F" d="M.52 5.16v1.185L5.273 9.91V4.25L2.702 3.16C1.803 2.486.52 3.126.52 4.25v.91Z" />
+        </svg>
+      )}
+    </span>
   )
 }
 

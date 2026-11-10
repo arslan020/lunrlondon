@@ -2,10 +2,13 @@ import { Link } from 'react-router-dom'
 import { siteConfig } from '../siteConfig'
 import { services } from '../data/services'
 
+const areas = ['London', 'Heathrow', 'Gatwick', 'Luton', 'Stansted', 'London City', 'Farnborough']
+
 function Footer() {
   return (
     <footer className="bg-black text-white">
-      <div className="mx-auto grid max-w-content grid-cols-1 gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+      <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6">
+      <div className="grid grid-cols-1 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
         <div>
           <Link to="/" className="mb-5 inline-flex items-center">
             {siteConfig.logo ? (
@@ -16,23 +19,13 @@ function Footer() {
               </span>
             )}
           </Link>
-          <p className="mt-5 max-w-xs text-xs leading-relaxed text-neutral-400">
-            This site is protected by reCAPTCHA and the Google{' '}
-            <a href="https://policies.google.com/privacy" className="underline" target="_blank" rel="noreferrer">
-              Privacy Policy
-            </a>{' '}
-            and{' '}
-            <a href="https://policies.google.com/terms" className="underline" target="_blank" rel="noreferrer">
-              Terms of Service
-            </a>{' '}
-            apply.
+          <p className="mt-4 text-sm leading-relaxed text-neutral-300">
+            {siteConfig.tagline}. Private cars for airport arrivals, one-way journeys, and hourly hire, with a
+            licensed chauffeur and the fare confirmed before you travel.
           </p>
-          <Link to={siteConfig.privacyPolicyUrl} className="mt-3 inline-block text-sm text-white hover:text-brand-primary">
-            Our Privacy Policy
-          </Link>
         </div>
 
-        <div>
+        <div className="lg:pl-8">
           <h3 className="mb-4 font-serif text-2xl text-brand-secondary">Services</h3>
           <ul className="space-y-2 text-sm">
             {services.map((service) => (
@@ -41,6 +34,15 @@ function Footer() {
                   {service.navLabel}
                 </Link>
               </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="lg:pl-8">
+          <h3 className="mb-4 font-serif text-2xl text-brand-secondary">Areas</h3>
+          <ul className="space-y-2 text-sm text-white">
+            {areas.map((area) => (
+              <li key={area}>{area}</li>
             ))}
           </ul>
         </div>
@@ -80,15 +82,17 @@ function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10 px-4 py-5 sm:px-6">
-        <div className="mx-auto flex max-w-content flex-col items-center justify-between gap-2 text-center text-xs text-neutral-500 sm:flex-row sm:text-left">
-          <span>
-            &copy; {new Date().getFullYear()} {siteConfig.brandName}. All rights reserved.
-          </span>
-          <a href="#top" className="hover:text-brand-primary">
-            Back to Top
-          </a>
-        </div>
+      <div className="flex items-center justify-between gap-4 whitespace-nowrap border-t border-white/10 py-5 text-xs text-neutral-500">
+        <span className="flex min-w-0 items-center gap-4">
+          <span>&copy; {new Date().getFullYear()} {siteConfig.brandName}. All rights reserved.</span>
+          <Link to={siteConfig.privacyPolicyUrl} className="text-neutral-300 hover:text-brand-primary">
+            Privacy Policy
+          </Link>
+        </span>
+        <a href="#top" className="shrink-0 hover:text-brand-primary">
+          Back to Top
+        </a>
+      </div>
       </div>
     </footer>
   )

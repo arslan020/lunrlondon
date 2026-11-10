@@ -315,7 +315,7 @@ export const services: ServiceData[] = [
       {
         heading: 'Flexible Cancellations and Clear Pricing',
         highlight: 'Flexible',
-        image: '/images/airport-pricing.jpg',
+        image: '/images/fleet-hero.jpg',
         paragraphs: [
           'Plans change. Cancel at no charge up to 24 hours before the pickup. Inside those 24 hours the booking is charged in full.',
           'The price is shown when you book, by airport and by vehicle. Regular travellers, and bookings that need more than one car, can be quoted separately and that rate is the one you confirm.',

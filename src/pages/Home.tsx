@@ -17,6 +17,8 @@ function Home() {
         subtext={`${siteConfig.brandName} provides a luxury chauffeur service for clients who expect precision, discretion, and professionalism as standard. Serving business leaders, private individuals, and specialist clients, we deliver refined chauffeured travel designed around comfort, reliability, and peace of mind.`}
         video="/videos/hero.mp4"
         image="/images/hero.jpg"
+        videoClassName="brightness-[1.18]"
+        scrim="soft"
       />
 
       <section className="bg-black py-12 md:py-16">

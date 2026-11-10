@@ -19,6 +19,7 @@ function revealOnScroll() {
   const nodes = [...main.querySelectorAll('h1, h2, h3, p, li, a.rounded-full')].filter((node) => {
     if (node.closest('.marquee-up')) return false
     if (node.closest('a.group')) return false
+    if (node.closest('.no-reveal')) return false
     return true
   })
 
