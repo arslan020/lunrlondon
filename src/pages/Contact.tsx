@@ -32,13 +32,11 @@ function Contact() {
   }
 
   const phone = siteConfig.phone || siteConfig.mobile
-  const phoneHref = phone ? `tel:${digits(phone)}` : ''
   const whatsappHref = phone ? `https://wa.me/${digits(phone).replace(/^\+/, '')}` : ''
   const emailHref = siteConfig.email ? `mailto:${siteConfig.email}` : ''
   const address = [siteConfig.address.line1, siteConfig.address.line2].filter(Boolean).join(', ')
 
   const channels = [
-    { label: 'Call', detail: phone || 'Number coming soon', href: phoneHref, icon: 'phone' as const },
     { label: 'WhatsApp', detail: phone ? 'Message the team' : 'Number coming soon', href: whatsappHref, icon: 'whatsapp' as const },
     { label: 'Email', detail: siteConfig.email || 'Email coming soon', href: emailHref, icon: 'email' as const },
   ]
@@ -128,28 +126,23 @@ function Contact() {
                   Talk to a person, any hour.
                 </h2>
                 <p className="mt-4 max-w-md text-sm leading-relaxed text-neutral-300">
-                  See a fare online, and reach the team when you want to talk the journey through.
+                  See a fare online, and reach the team when you want to talk the journey through. We accept cryptocurrency.
                 </p>
                 <Link to="/book" className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-white">
                   Book now / Get quote
                   <span aria-hidden="true">›</span>
                 </Link>
 
-                <div className="mt-6 border-t border-white/10">
+                <div className="mt-6 grid grid-cols-2 gap-3">
                   {channels.map((channel) => {
                     const row = (
                       <>
-                        <ChannelIcon name={channel.icon} />
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[11px] font-semibold uppercase tracking-[0.16em]">{channel.label}</span>
-                          <span className="mt-0.5 block truncate text-sm text-neutral-400">{channel.detail}</span>
-                        </span>
-                        <span className="contact-channel-arrow text-neutral-500" aria-hidden="true">
-                          ›
-                        </span>
+                        <ChannelIcon name={channel.icon} large />
+                        <span className="block text-[11px] font-semibold uppercase tracking-[0.16em]">{channel.label}</span>
+                        <span className="block truncate text-xs text-neutral-400">{channel.detail}</span>
                       </>
                     )
-                    const rowClass = 'contact-channel flex items-center gap-4 rounded-lg border-b border-white/10 px-2 py-4'
+                    const rowClass = 'contact-channel flex flex-col items-center justify-center gap-2 rounded-xl border border-white/10 bg-black/50 px-3 py-6 text-center'
                     return channel.href ? (
                       <a
                         key={channel.label}
@@ -237,11 +230,11 @@ function Contact() {
                 </li>
               ))}
             </ol>
-            {phoneHref && (
+            {whatsappHref && (
               <p className="text-sm text-neutral-300">
                 Need an answer now?{' '}
-                <a href={phoneHref} className="font-semibold text-white">
-                  Call {phone}
+                <a href={whatsappHref} className="font-semibold text-white" target="_blank" rel="noreferrer">
+                  Message us on WhatsApp
                 </a>
                 .
               </p>
@@ -379,11 +372,13 @@ function PinIcon() {
   )
 }
 
-function ChannelIcon({ name }: { name: 'phone' | 'whatsapp' | 'email' }) {
+function ChannelIcon({ name, large = false }: { name: 'phone' | 'whatsapp' | 'email'; large?: boolean }) {
+  const box = large ? 'h-12 w-12' : 'h-8 w-8'
+  const glyph = large ? 'h-6 w-6' : 'h-[17px] w-[17px]'
   return (
-    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/[0.07]">
+    <span className={`flex ${box} shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/[0.07]`}>
       {name === 'phone' && (
-        <svg viewBox="0 0 24 24" className="h-[17px] w-[17px]" fill="none" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className={glyph} fill="none" aria-hidden="true">
           <path
             d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.69 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.33 1.84.56 2.8.69A2 2 0 0 1 22 16.92Z"
             stroke="#58A9FF"
@@ -394,7 +389,7 @@ function ChannelIcon({ name }: { name: 'phone' | 'whatsapp' | 'email' }) {
         </svg>
       )}
       {name === 'whatsapp' && (
-        <svg viewBox="0 0 24 24" className="h-[17px] w-[17px]" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className={glyph} aria-hidden="true">
           <path
             fill="#25D366"
             d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.148-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.075-.792.372-.272.297-1.04 1.016-1.04 2.479s1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.981.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884a9.82 9.82 0 0 1 7.021 2.91 9.82 9.82 0 0 1 2.9 7.025c-.003 5.45-4.437 9.884-9.884 9.884m8.413-18.297A11.8 11.8 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.88 11.88 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.82 11.82 0 0 0 20.52 3.49Z"
@@ -402,7 +397,7 @@ function ChannelIcon({ name }: { name: 'phone' | 'whatsapp' | 'email' }) {
         </svg>
       )}
       {name === 'email' && (
-        <svg viewBox="0 0 24 24" className="h-[17px] w-[17px]" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className={glyph} aria-hidden="true">
           <path fill="#4285F4" d="M1.636 18.727h3.637V9.91L.52 6.345v11.473c0 .502.407.909.91.909h.206Z" />
           <path fill="#34A853" d="M18.727 18.727h3.637c.502 0 .909-.407.909-.909V6.345L18.727 9.91v8.817Z" />
           <path fill="#EA4335" d="M18.727 4.25v5.66l4.546-3.565V5.16c0-1.124-1.283-1.766-2.182-1.091L18.727 4.25Z" />

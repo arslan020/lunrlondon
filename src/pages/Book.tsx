@@ -247,7 +247,7 @@ function Book() {
         <aside className="min-w-0 rounded-2xl border border-white/10 bg-[#141413] p-5 text-white sm:p-6">
           <h2 className="font-serif text-3xl">Price list</h2>
           <p className="mt-2 text-sm leading-relaxed text-neutral-400">
-            Hourly hire is charged per hour. Airport fares are fixed from central London. A return booking doubles the fare.
+            Hourly hire is charged per hour. Airport fares are fixed from central London. A return booking doubles the fare. We accept cryptocurrency.
           </p>
 
           <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-brand-primary">Per hour</h3>

@@ -10,6 +10,10 @@ export const faqGroups: FaqGroup[] = [
           'You can book through our website, by email, or by contacting our team directly. Once confirmed, you will receive a detailed quotation and written confirmation.',
       },
       {
+        question: 'Do you accept cryptocurrency?',
+        answer: 'Yes. Cryptocurrency is accepted. Ask when you book and we will confirm the payment.',
+      },
+      {
         question: 'Are your prices transparent with no hidden charges?',
         answer:
           'Yes. Quotes are made clear at the time of booking, congestion zone fees are included, and any extras are outlined in advance.',

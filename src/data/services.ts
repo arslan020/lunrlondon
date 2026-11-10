@@ -1,4 +1,9 @@
 import type { ServiceData } from '../types'
+import { siteConfig } from '../siteConfig'
+
+const closeProtectionBooking = siteConfig.email
+  ? `To book, email ${siteConfig.email} with the dates, the movements, and how visible the car should be. We accept cryptocurrency.`
+  : 'To book, email us through the contact page with the dates, the movements, and how visible the car should be. We accept cryptocurrency.'
 
 export const services: ServiceData[] = [
   {
@@ -354,7 +359,7 @@ export const services: ServiceData[] = [
     heroHeading: 'Close Protection Services',
     heroHighlight: 'Close Protection',
     heroSubtext:
-      'A dedicated close protection service for clients who need a trained protection officer alongside chauffeured travel.',
+      'A private car with the route planned before you leave, for clients who want the journey kept quiet.',
     heroImage: '/images/close-protection.jpg',
     imagePosition: 'object-[center_40%]',
     sections: [
@@ -363,8 +368,8 @@ export const services: ServiceData[] = [
         highlight: 'Discreet',
         image: '/images/cp-travel.jpg',
         paragraphs: [
-          'This is for clients who need the journey controlled and quiet: executives, public figures, and anyone who does not want the car to draw attention.',
-          'The day is run calmly, in private, and with the route prepared before you leave.',
+          'A close protection booking is chauffeured travel with the day arranged in advance. You set the movements. We confirm the vehicle, the timing, and how the arrival should feel.',
+          'The car stays with that brief, whether it is one journey, a working day of several stops, or a run of days.',
         ],
       },
       {
@@ -373,10 +378,10 @@ export const services: ServiceData[] = [
         image: '/images/cp-london.jpg',
         imageFirst: true,
         paragraphs: [
-          'This is more than a smooth drive. It needs preparation and a disciplined way of working.',
-          'Routes are checked in advance, including a second option if the first is no longer suitable. The chauffeur stays aware of what is happening around the car, and stays unobtrusive while doing it.',
+          'The route is agreed before you leave, including another option if the first is no longer suitable. The chauffeur stays with the booking and keeps the handover quiet.',
+          'It suits a private appointment, a public appearance, or a day that should not draw attention to the car.',
         ],
-        buttonLabel: 'Discuss Your Requirements',
+        buttonLabel: 'Email us to book',
         buttonTo: '/contact',
       },
       {
@@ -384,27 +389,24 @@ export const services: ServiceData[] = [
         heading: 'Discretion and Confidentiality as Standard',
         highlight: 'Discretion',
         paragraphs: [
-          'These bookings are often sensitive. The details of the journey stay private.',
-          'A written confidentiality agreement can be put in place when you need one. Cars are presented properly and kept understated, so the vehicle itself does not attract a crowd.',
-          'The same approach covers a public appearance, a private appointment, or a working day of several stops.',
+          'The details of the booking stay between you and the team. Cars are kept understated, so the vehicle itself is not the point of the day.',
+          'The same approach covers an executive diary, a private visit, or an event arrival.',
         ],
         buttonLabel: 'Book Now',
         buttonTo: '/contact',
       },
       {
-        heading: 'Close Protection with Further Training',
-        highlight: 'Protection',
+        heading: 'What the Booking Covers',
+        highlight: 'Booking',
         image: '/images/cp-training.jpg',
-        paragraphs: [
-          'Where the booking needs it, the people on the job hold further qualifications. If you already have a security team, the car is fitted into that plan, and the brief is agreed before the day starts. That can include:',
-        ],
+        paragraphs: ['A close protection booking can include:'],
         bullets: [
-          'Advanced and defensive driving',
-          'Close protection training',
-          'Risk awareness and threat management',
-          'Working alongside a private security team',
+          'A chauffeur for the movements you set out',
+          'The route agreed before the day',
+          'A vehicle chosen for the journey and how visible it should be',
+          'The day run to the brief you give us',
         ],
-        buttonLabel: 'Enquire About Close Protection',
+        buttonLabel: 'Email us to book',
         buttonTo: '/contact',
       },
       {
@@ -413,21 +415,21 @@ export const services: ServiceData[] = [
         image: '/images/fleet-hero.jpg',
         imageFirst: true,
         paragraphs: [
-          'A single journey, a full day, several days, or an ongoing arrangement can all be set up. The vehicle is prepared for the assignment. Close protection driving is arranged for:',
+          'Close protection driving is arranged for:',
         ],
         bullets: [
           'Corporate executives',
-          'Public figures',
-          'Legal professionals',
-          'Visitors who need a controlled arrival',
-          'Clients at high-visibility events',
+          'Private clients',
+          'Visitors who want a controlled arrival',
+          'Legal appointments',
+          'Clients at events',
         ],
       },
       {
         layout: 'bar',
         heading: 'Close protection enquiry',
-        paragraphs: ['Tell us the dates and the movements, or ask for a quotation.'],
-        buttonLabel: 'Contact Us',
+        paragraphs: ['Email us to book. Share the dates and the movements, and we will confirm the vehicle.'],
+        buttonLabel: 'Email us to book',
         buttonTo: '/contact',
       },
       {
@@ -449,16 +451,16 @@ export const services: ServiceData[] = [
         image: '/images/cp-officer.jpg',
         imageFirst: true,
         paragraphs: [
-          'The quote follows a conversation: how long you need the car, what level of cover, and which vehicle. There is no extra line for the congestion charge. It sits inside the price you are given.',
-          'You can cancel at no charge up to 24 hours before travel, unless a specialist assignment has been agreed on different terms. Child and baby seats can be added if they are requested in advance.',
+          'The quote follows a short brief: the dates, the movements, the vehicle, and how quiet the arrival should be.',
+          closeProtectionBooking,
         ],
       },
     ],
     closingHeading: 'Arrange Close Protection',
     closingHighlight: 'Arrange',
     closingText:
-      'Share the outline in confidence. We come back with how the journey would be covered, and the vehicle that fits it.',
-    closingButtonLabel: 'Contact Us',
+      'Email the outline. We come back with how the journey would be covered, and the vehicle that fits it.',
+    closingButtonLabel: 'Email us to book',
     closingButtonTo: '/contact',
   },
 ]
