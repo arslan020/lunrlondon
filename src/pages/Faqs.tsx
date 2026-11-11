@@ -29,7 +29,7 @@ function Faqs() {
               </Link>
             </div>
           </div>
-          <ImagePlaceholder label="Range Rover" src="/images/range-rover-city.jpg" className="min-h-[220px]" />
+          <ImagePlaceholder label="Range Rover" src="/images/rr-parklane.jpg" className="min-h-[220px]" />
         </div>
       </section>
 

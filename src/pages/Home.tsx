@@ -77,7 +77,7 @@ function Home() {
               <Button to="/book">Book With Confidence</Button>
             </div>
           </div>
-          <ImagePlaceholder label="Range Rover" src="/images/range-rover-city.jpg" className="min-h-[240px]" />
+          <ImagePlaceholder label="Range Rover" src="/images/rr-country.jpg" className="min-h-[240px]" />
         </div>
       </section>
 
@@ -85,7 +85,7 @@ function Home() {
         <div className="mx-auto grid max-w-content items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
           <ImagePlaceholder
             label="Range Rover"
-            src="/images/range-rover-classic.jpg"
+            src="/images/rr-manor-side.jpg"
             className="order-1 min-h-[240px] lg:order-1"
           />
           <div className="order-2">
@@ -152,7 +152,7 @@ function Home() {
               Child and baby seats are available on request and must be arranged in advance.
             </p>
           </div>
-          <ImagePlaceholder label="Range Rover" src="/images/range-rover-vogue.jpg" className="min-h-[240px]" />
+          <ImagePlaceholder label="Range Rover" src="/images/rr-manor-wide.jpg" className="min-h-[240px]" />
         </div>
       </section>
 

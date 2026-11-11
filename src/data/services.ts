@@ -27,7 +27,7 @@ export const services: ServiceData[] = [
       {
         heading: 'Built Around Your Day',
         highlight: 'Your Day',
-        image: '/images/range-rover-city.jpg',
+        image: '/images/rr-hotel.jpg',
         imageFirst: true,
         paragraphs: [
           'A morning of meetings, an afternoon of appointments, and an evening across two or three addresses can sit on one booking. You tell the chauffeur the next stop when you come out.',
@@ -38,11 +38,11 @@ export const services: ServiceData[] = [
       },
       {
         layout: 'gold',
-        heading: 'Professional Chauffeurs You Can Rely On',
+        heading: 'Distinguished Chauffeurs, Always at Your Service.',
         highlight: 'Chauffeurs',
         paragraphs: [
-          'Every hourly booking is driven by a licensed chauffeur. The same person stays with you, so you are not explaining the day again at each address.',
-          'Presentation stays tidy, the car is on time for the first pickup, and the chauffeur waits without needing to be called back.',
+          'Every hourly booking is accompanied by a licensed chauffeur who remains with you throughout, so your itinerary never needs repeating at each stop.',
+          'Your chauffeur arrives promptly, is immaculately presented, and remains on hand for the duration of your booking, ready the moment you are.',
         ],
         buttonLabel: 'Contact Us',
         buttonTo: '/contact',
@@ -50,7 +50,7 @@ export const services: ServiceData[] = [
       {
         heading: 'Hourly Hire for a Full Day of Stops',
         highlight: 'Hourly',
-        image: '/images/range-rover-classic.jpg',
+        image: '/images/rr-manor-angle.jpg',
         paragraphs: [
           'Clients use as-directed hire when the car needs to be nearby, not booked again for every leg. It is a regular choice for:',
         ],
@@ -88,7 +88,6 @@ export const services: ServiceData[] = [
       {
         heading: 'Flexible Cancellations and a Clear Quote',
         highlight: 'Flexible',
-        image: '/images/range-rover.jpg',
         paragraphs: [
           'Plans change. Cancel at no charge up to 24 hours before the pickup. Inside those 24 hours the booking is charged in full.',
           'The hourly rate and the number of hours are shown before you confirm. If the day runs longer, extra hours are agreed at the same rate.',
@@ -127,12 +126,14 @@ export const services: ServiceData[] = [
     heroHighlight: 'One Way',
     heroSubtext:
       'A direct chauffeur journey from one address to another, across London and the UK, with the vehicle prepared before you step in.',
-    heroImage: '/images/range-rover-vogue.jpg',
+    heroImage: '/images/rr-side-wide.jpg',
+    cardImage: '/images/rr-barn.jpg',
+    imagePosition: 'object-[center_60%]',
     sections: [
       {
         heading: 'Point to Point, Without the Wait',
         highlight: 'Point to Point',
-        image: '/images/range-rover.jpg',
+        image: '/images/rr-bonnet.jpg',
         paragraphs: [
           'A one-way transfer is a single collection and a single drop-off: a hotel, an office, a private address, or a venue. The car is prepared before you step in, and the journey ends when you arrive.',
           'If either end is London City, Heathrow, Gatwick, Luton, Stansted, or Farnborough, the fixed airport fare applies. Every other route is priced from the hourly rate and confirmed against the exact journey.',
@@ -164,7 +165,7 @@ export const services: ServiceData[] = [
       {
         heading: 'Journeys a One Way Transfer Covers',
         highlight: 'One Way',
-        image: '/images/range-rover-classic.jpg',
+        image: '/images/rr-street.jpg',
         paragraphs: [
           'Use a one-way transfer when you need the car for the journey itself, not for the hours in between. It is booked for:',
         ],
@@ -203,7 +204,6 @@ export const services: ServiceData[] = [
       {
         heading: 'Flexible Cancellations and a Clear Quote',
         highlight: 'Flexible',
-        image: '/images/range-rover-city.jpg',
         paragraphs: [
           'Plans change. Cancel at no charge up to 24 hours before the pickup. Inside those 24 hours the booking is charged in full.',
           'The fare is shown when you book. The congestion charge is included in that quote, so it is not added afterwards.',

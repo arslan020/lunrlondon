@@ -39,7 +39,7 @@ export const vehicles: Vehicle[] = [
     shortName: 'Range Rover',
     hourly: 100,
     seats: 'Up to 4 passengers',
-    image: '/images/range-rover.jpg',
+    image: '/images/rr-manor-front.jpg',
   },
   {
     id: 's-class',

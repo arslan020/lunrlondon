@@ -99,8 +99,8 @@ function ServiceDetail() {
 
           return (
             <section key={section.heading}>
-              <div className="mx-auto grid max-w-content items-center gap-8 px-4 py-10 sm:px-6 md:py-16 lg:grid-cols-2 lg:gap-12">
-                <div className={section.imageFirst ? 'order-2' : 'order-2 lg:order-1'}>
+              <div className={`mx-auto grid max-w-content items-center gap-8 px-4 py-10 sm:px-6 md:py-16 ${section.image ? 'lg:grid-cols-2 lg:gap-12' : ''}`}>
+                <div className={section.image ? (section.imageFirst ? 'order-2' : 'order-2 lg:order-1') : ''}>
                   <SectionHeading heading={section.heading} highlight={section.highlight} />
                   {section.paragraphs.map((paragraph) => (
                     <p key={paragraph} className="mt-5 leading-relaxed text-neutral-200">
@@ -123,11 +123,13 @@ function ServiceDetail() {
                     </div>
                   )}
                 </div>
-                <ImagePlaceholder
-                  label={section.heading}
-                  src={section.image}
-                  className={`order-1 min-h-[220px] ${section.imageFirst ? '' : 'lg:order-2'}`}
-                />
+                {section.image && (
+                  <ImagePlaceholder
+                    label={section.heading}
+                    src={section.image}
+                    className={`order-1 min-h-[220px] ${section.imageFirst ? '' : 'lg:order-2'}`}
+                  />
+                )}
               </div>
             </section>
           )

@@ -17,6 +17,7 @@ export interface ServiceData {
   heroHighlight?: string
   heroSubtext: string
   heroImage?: string
+  cardImage?: string
   imagePosition?: string
   sections: ServiceFeatureSection[]
   closingHeading: string
