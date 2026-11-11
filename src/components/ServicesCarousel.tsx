@@ -52,7 +52,7 @@ function ServicesCarousel() {
             title={service.navLabel}
             image={service.cardImage ?? service.heroImage}
             contain={service.slug === 'as-directed'}
-            imagePosition={service.slug === 'one-way-transfer' ? 'object-[center_80%]' : 'object-center'}
+            imagePosition={service.slug === 'one-way-transfer' ? 'object-[center_72%]' : 'object-center'}
           />
         ))}
       </div>
