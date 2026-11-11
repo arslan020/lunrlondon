@@ -13,6 +13,7 @@ interface PageHeroProps {
   video?: string
   image?: string
   imagePosition?: string
+  imageFit?: 'cover' | 'contain' | 'natural'
   videoClassName?: string
   contentClassName?: string
   scrim?: 'default' | 'soft'
@@ -30,10 +31,13 @@ function PageHero({
   video,
   image,
   imagePosition = 'object-center',
+  imageFit = 'cover',
   videoClassName = '',
   contentClassName = 'pb-12 sm:pb-16 lg:pb-20',
   scrim = 'default',
 }: PageHeroProps) {
+  const natural = imageFit === 'natural' && Boolean(image) && !video
+
   let renderedHeading: ReactNode = heading
   if (highlight && heading.includes(highlight)) {
     const [before, after] = heading.split(highlight)
@@ -47,7 +51,13 @@ function PageHero({
   }
 
   return (
-    <section className="relative flex min-h-[100svh] items-end overflow-hidden bg-neutral-950">
+    <section
+      className={
+        natural
+          ? 'relative bg-neutral-950'
+          : 'relative flex min-h-[100svh] items-end overflow-hidden bg-neutral-950'
+      }
+    >
       {video ? (
         <video
           className={`absolute inset-0 h-full w-full object-cover ${videoClassName}`}
@@ -58,8 +68,14 @@ function PageHero({
           loop
           playsInline
         />
+      ) : natural ? (
+        <img
+          src={image ?? ''}
+          alt=""
+          className="block w-full bg-neutral-950 object-contain object-top brightness-110 max-lg:min-h-[36rem] lg:h-auto"
+        />
       ) : image ? (
-        <img src={image} alt="" className={`absolute inset-0 h-full w-full object-cover brightness-110 ${imagePosition}`} />
+        <img src={image} alt="" className={`absolute inset-0 h-full w-full brightness-110 ${imageFit === 'contain' ? 'object-contain' : 'object-cover'} ${imagePosition}`} />
       ) : (
         <img src="/images/hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover brightness-110" />
       )}
@@ -70,7 +86,13 @@ function PageHero({
         }`}
       />
 
-      <div className={`relative z-10 mx-auto w-full max-w-content px-4 pt-32 sm:px-6 ${contentClassName}`}>
+      <div
+        className={
+          natural
+            ? 'absolute inset-x-0 bottom-0 z-10 mx-auto w-full max-w-content px-4 pb-10 sm:px-6 sm:pb-14'
+            : `relative z-10 mx-auto w-full max-w-content px-4 pt-32 sm:px-6 ${contentClassName}`
+        }
+      >
         <div className="max-w-2xl text-left">
           {eyebrow && (
             <span className="mb-4 block text-[11px] font-semibold uppercase tracking-[0.25em] text-brand-primary">

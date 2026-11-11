@@ -3,7 +3,14 @@ import PageHero from '../components/PageHero'
 import SectionHeading from '../components/SectionHeading'
 import CTASection from '../components/CTASection'
 import Button from '../components/Button'
-import { formatPrice, vehicles } from '../data/pricing'
+import { formatPrice, vehicles, type VehicleId } from '../data/pricing'
+
+const cardImagePosition: Record<VehicleId, string> = {
+  'e-class': 'object-[center_88%]',
+  'v-class': 'object-center',
+  'range-rover': 'object-[center_78%]',
+  's-class': 'object-center',
+}
 
 function OurLuxuryFleet() {
   return (
@@ -14,8 +21,8 @@ function OurLuxuryFleet() {
         subtext="Our vehicles are chosen for comfort, refinement, and reliability. Every journey is presented in a meticulously prepared car, driven by a licensed chauffeur."
         buttonLabel="Choose Your Vehicle"
         buttonTo="/book"
-        image="/images/fleet-hero.jpg"
-        imagePosition="object-[center_70%]"
+        image="/images/fleet-lineup.jpg"
+        imageFit="natural"
       />
 
       <section className="py-12 md:py-20">
@@ -34,11 +41,17 @@ function OurLuxuryFleet() {
       </section>
 
       <section className="pb-12 md:pb-20">
-        <div className="mx-auto grid max-w-content grid-cols-1 gap-5 px-4 sm:grid-cols-2 sm:px-6 xl:grid-cols-4">
+        <div className="mx-auto grid max-w-content grid-cols-1 items-stretch gap-5 px-4 sm:grid-cols-2 sm:px-6 xl:grid-cols-4">
           {vehicles.map((vehicle) => (
-            <article key={vehicle.id} className="overflow-hidden rounded-[1rem] bg-[#141413]">
-              <img src={vehicle.image} alt={vehicle.name} className="aspect-[4/3] w-full object-cover" />
-              <div className="p-5">
+            <article key={vehicle.id} className="flex h-full flex-col overflow-hidden rounded-[1rem] bg-[#141413]">
+              <div className="aspect-[3/2] overflow-hidden bg-[#141413]">
+                <img
+                  src={vehicle.image}
+                  alt={vehicle.name}
+                  className={`h-full w-full object-cover ${cardImagePosition[vehicle.id]}`}
+                />
+              </div>
+              <div className="flex flex-1 flex-col p-5">
                 <h3 className="font-serif text-3xl text-white">{vehicle.shortName}</h3>
                 <p className="mt-1 text-sm text-neutral-400">{vehicle.seats}</p>
                 <p className="mt-4 font-serif text-4xl text-brand-primary">
@@ -49,7 +62,7 @@ function OurLuxuryFleet() {
                 </p>
                 <Link
                   to="/book"
-                  className="mt-5 inline-flex rounded-full bg-brand-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-brand-primary-contrast"
+                  className="mt-5 inline-flex w-fit rounded-full bg-brand-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-brand-primary-contrast"
                 >
                   Book Now
                 </Link>

@@ -23,7 +23,7 @@ export const vehicles: Vehicle[] = [
     shortName: 'E-Class',
     hourly: 50,
     seats: 'Up to 3 passengers',
-    image: '/images/e-class.jpg',
+    image: '/images/e-class-glass.jpg',
   },
   {
     id: 'v-class',
@@ -31,7 +31,7 @@ export const vehicles: Vehicle[] = [
     shortName: 'V-Class',
     hourly: 70,
     seats: 'Up to 6 passengers',
-    image: '/images/v-class.jpg',
+    image: '/images/v-class-street.jpg',
   },
   {
     id: 'range-rover',
@@ -47,7 +47,7 @@ export const vehicles: Vehicle[] = [
     shortName: 'S-Class',
     hourly: 75,
     seats: 'Up to 3 passengers',
-    image: '/images/s-class.jpg',
+    image: '/images/s-class-cobble.jpg',
   },
 ]
 

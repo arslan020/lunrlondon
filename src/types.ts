@@ -7,6 +7,8 @@ export interface ServiceFeatureSection {
   buttonTo?: string
   image?: string
   imageFirst?: boolean
+  imageFit?: 'cover' | 'contain'
+  imageRatio?: string
   layout?: 'split' | 'gold' | 'bar'
 }
 

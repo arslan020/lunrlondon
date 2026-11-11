@@ -4,16 +4,22 @@ interface ServiceCardProps {
   slug: string
   title: string
   image?: string
+  contain?: boolean
+  imagePosition?: string
 }
 
-function ServiceCard({ slug, title, image }: ServiceCardProps) {
+function ServiceCard({ slug, title, image, contain = false, imagePosition = 'object-center' }: ServiceCardProps) {
   return (
     <Link
       to={`/chauffeur-services/${slug}`}
-      className="group relative block aspect-square w-[78vw] max-w-[340px] shrink-0 snap-start overflow-hidden rounded-[1rem] bg-neutral-800 sm:w-[300px] lg:w-[320px]"
+      className="group relative block aspect-[3/2] w-[78vw] max-w-[340px] shrink-0 snap-start overflow-hidden rounded-[1rem] bg-neutral-900 sm:w-[300px] lg:w-[320px]"
     >
       {image ? (
-        <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+        <img
+          src={image}
+          alt=""
+          className={`absolute inset-0 h-full w-full ${imagePosition} ${contain ? 'object-contain' : 'object-cover'}`}
+        />
       ) : (
         <div className="absolute inset-0 bg-neutral-800" />
       )}

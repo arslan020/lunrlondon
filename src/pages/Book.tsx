@@ -197,7 +197,7 @@ function Book() {
                             selected ? 'border-neutral-900 bg-neutral-50' : 'border-neutral-200'
                           }`}
                         >
-                          <img src={vehicle.image} alt="" className="h-14 w-16 shrink-0 rounded-lg object-cover sm:h-16 sm:w-20" />
+                          <img src={vehicle.image} alt="" className="h-14 w-16 shrink-0 rounded-lg bg-neutral-100 object-contain sm:h-16 sm:w-20" />
                           <span className="min-w-0 flex-1">
                             <span className="block font-semibold">{vehicle.shortName}</span>
                             <span className="block text-xs text-neutral-500">

@@ -13,7 +13,8 @@ export const services: ServiceData[] = [
     heroHighlight: 'Hourly',
     heroSubtext:
       'Keep your chauffeur and vehicle on standby for as long as you need. The car stays with you between meetings, fittings, or evening plans.',
-    heroImage: '/images/as-directed.jpg',
+    heroImage: '/images/hourly-arrival.jpg',
+    cardImage: '/images/hourly-arrival.jpg',
     sections: [
       {
         heading: 'The Car Stays With You',
@@ -64,7 +65,7 @@ export const services: ServiceData[] = [
       {
         heading: 'Clear Hourly Rates',
         highlight: 'Hourly',
-        image: '/images/s-class.jpg',
+        image: '/images/s-class-ivy.jpg',
         imageFirst: true,
         paragraphs: [
           'The minimum booking is two hours. You choose how many hours you need, and the congestion charge is included in the rate you confirm. The hourly rates are:',
@@ -88,6 +89,8 @@ export const services: ServiceData[] = [
       {
         heading: 'Flexible Cancellations and a Clear Quote',
         highlight: 'Flexible',
+        image: '/images/e-class-terrace.jpg',
+        imageFirst: true,
         paragraphs: [
           'Plans change. Cancel at no charge up to 24 hours before the pickup. Inside those 24 hours the booking is charged in full.',
           'The hourly rate and the number of hours are shown before you confirm. If the day runs longer, extra hours are agreed at the same rate.',
@@ -98,7 +101,7 @@ export const services: ServiceData[] = [
       {
         heading: 'Vehicles Ready When You Are',
         highlight: 'Ready',
-        image: '/images/v-class.jpg',
+        image: '/images/v-class-hotel.jpg',
         imageFirst: true,
         paragraphs: [
           'Hourly hire is available in the E-Class, S-Class, V-Class, and Range Rover. The V-Class suits a larger party. The saloons and the Range Rover suit up to three or four passengers.',
@@ -127,13 +130,14 @@ export const services: ServiceData[] = [
     heroSubtext:
       'A direct chauffeur journey from one address to another, across London and the UK, with the vehicle prepared before you step in.',
     heroImage: '/images/rr-side-wide.jpg',
-    cardImage: '/images/rr-barn.jpg',
+    cardImage: '/images/rr-hotel-door.jpg',
     imagePosition: 'object-[center_60%]',
     sections: [
       {
         heading: 'Point to Point, Without the Wait',
         highlight: 'Point to Point',
-        image: '/images/rr-bonnet.jpg',
+        image: '/images/rr-vip.jpg',
+        imageFit: 'contain',
         paragraphs: [
           'A one-way transfer is a single collection and a single drop-off: a hotel, an office, a private address, or a venue. The car is prepared before you step in, and the journey ends when you arrive.',
           'If either end is London City, Heathrow, Gatwick, Luton, Stansted, or Farnborough, the fixed airport fare applies. Every other route is priced from the hourly rate and confirmed against the exact journey.',
@@ -142,7 +146,7 @@ export const services: ServiceData[] = [
       {
         heading: 'One Collection, One Drop-off',
         highlight: 'Collection',
-        image: '/images/e-class.jpg',
+        image: '/images/e-class-hotel.jpg',
         imageFirst: true,
         paragraphs: [
           'This is the booking for a journey that does not need the car to wait. You are collected at the agreed time, and taken straight to the address.',
@@ -179,7 +183,7 @@ export const services: ServiceData[] = [
       {
         heading: 'How the Fare Is Worked Out',
         highlight: 'Fare',
-        image: '/images/s-class.jpg',
+        image: '/images/s-class-palace.jpg',
         imageFirst: true,
         paragraphs: [
           'Airport journeys use the fixed fare for that airport and vehicle. Any other one-way route is priced from the hourly rate, with a two-hour minimum, and confirmed against the route before you travel.',
@@ -204,6 +208,7 @@ export const services: ServiceData[] = [
       {
         heading: 'Flexible Cancellations and a Clear Quote',
         highlight: 'Flexible',
+        image: '/images/e-class-side.jpg',
         paragraphs: [
           'Plans change. Cancel at no charge up to 24 hours before the pickup. Inside those 24 hours the booking is charged in full.',
           'The fare is shown when you book. The congestion charge is included in that quote, so it is not added afterwards.',
@@ -214,7 +219,7 @@ export const services: ServiceData[] = [
       {
         heading: 'Vehicles for a Direct Journey',
         highlight: 'Direct',
-        image: '/images/v-class.jpg',
+        image: '/images/v-class-bridge.jpg',
         imageFirst: true,
         paragraphs: [
           'One-way transfers run in the E-Class, S-Class, V-Class, and Range Rover. Choose the saloon or the Range Rover for up to three or four passengers, or the V-Class when the party is larger.',
@@ -367,6 +372,7 @@ export const services: ServiceData[] = [
         heading: 'Discreet Travel, Without the Show',
         highlight: 'Discreet',
         image: '/images/cp-travel.jpg',
+        imageRatio: 'aspect-[3/2]',
         paragraphs: [
           'A close protection booking is chauffeured travel with the day arranged in advance. You set the movements. We confirm the vehicle, the timing, and how the arrival should feel.',
           'The car stays with that brief, whether it is one journey, a working day of several stops, or a run of days.',
@@ -399,6 +405,7 @@ export const services: ServiceData[] = [
         heading: 'What the Booking Covers',
         highlight: 'Booking',
         image: '/images/cp-training.jpg',
+        imageRatio: 'aspect-[3/2]',
         paragraphs: ['A close protection booking can include:'],
         bullets: [
           'A chauffeur for the movements you set out',
@@ -412,7 +419,8 @@ export const services: ServiceData[] = [
       {
         heading: 'Flexible Close Protection',
         highlight: 'Flexible',
-        image: '/images/fleet-hero.jpg',
+        image: '/images/cp-assignment.jpg',
+        imageRatio: 'aspect-[3/2]',
         imageFirst: true,
         paragraphs: [
           'Close protection driving is arranged for:',

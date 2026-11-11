@@ -46,7 +46,14 @@ function ServicesCarousel() {
         className="flex min-w-0 flex-1 snap-x snap-mandatory gap-4 overflow-x-auto pb-2 scrollbar-none"
       >
         {services.map((service) => (
-          <ServiceCard key={service.slug} slug={service.slug} title={service.navLabel} image={service.cardImage ?? service.heroImage} />
+          <ServiceCard
+            key={service.slug}
+            slug={service.slug}
+            title={service.navLabel}
+            image={service.cardImage ?? service.heroImage}
+            contain={service.slug === 'as-directed'}
+            imagePosition={service.slug === 'one-way-transfer' ? 'object-[center_80%]' : 'object-center'}
+          />
         ))}
       </div>
       <div className="hidden shrink-0 md:flex">{arrows}</div>

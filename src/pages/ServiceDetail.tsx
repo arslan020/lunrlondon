@@ -127,6 +127,8 @@ function ServiceDetail() {
                   <ImagePlaceholder
                     label={section.heading}
                     src={section.image}
+                    fit={section.imageFit}
+                    ratio={section.imageRatio}
                     className={`order-1 min-h-[220px] ${section.imageFirst ? '' : 'lg:order-2'}`}
                   />
                 )}
