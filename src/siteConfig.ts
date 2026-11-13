@@ -7,7 +7,7 @@ export const siteConfig = {
   tagline: 'Luxury Chauffeur Services | Available 24/7',
   phone: '', // add the client's real phone number here
   mobile: '', // add the client's real mobile number here
-  email: '', // add the client's real email address here
+  email: 'bookings@lunrlondon.co.uk',
   address: {
     line1: 'Your Business Address',
     line2: 'Your City, Postcode',

@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, type FormEvent, type PointerEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { faqGroups } from '../data/faqs'
+import { sendEnquiry } from '../lib/sendEnquiry'
 import { siteConfig } from '../siteConfig'
 
 const fieldClass =
@@ -12,6 +13,8 @@ function digits(value: string) {
 
 function Contact() {
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
   const [query, setQuery] = useState('')
   const [group, setGroup] = useState('All')
   const [showAll, setShowAll] = useState(false)
@@ -61,9 +64,27 @@ function Contact() {
     document.getElementById('enquiry')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setSubmitted(true)
+    const form = event.currentTarget
+    const data = new FormData(form)
+    setSending(true)
+    setError('')
+    try {
+      await sendEnquiry({
+        kind: 'contact',
+        name: String(data.get('name') ?? ''),
+        email: String(data.get('email') ?? ''),
+        phone: String(data.get('phone') ?? ''),
+        message: String(data.get('message') ?? ''),
+        website: String(data.get('website') ?? ''),
+      })
+      setSubmitted(true)
+    } catch {
+      setError('We could not send that just now. Please try again in a moment.')
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -139,7 +160,9 @@ function Contact() {
                       <>
                         <ChannelIcon name={channel.icon} large />
                         <span className="block text-[11px] font-semibold uppercase tracking-[0.16em]">{channel.label}</span>
-                        <span className="block truncate text-xs text-neutral-400">{channel.detail}</span>
+                        <span className="block break-words text-xs text-neutral-400">
+                          {channel.label === 'Email' ? channel.detail.replace('@', '@\u200b') : channel.detail}
+                        </span>
                       </>
                     )
                     const rowClass = 'contact-channel flex flex-col items-center justify-center gap-2 rounded-xl border border-white/10 bg-black/50 px-3 py-6 text-center'
@@ -191,12 +214,15 @@ function Contact() {
                       Message <span className="text-neutral-400">*</span>
                       <textarea required name="message" rows={4} placeholder="How can we help you?" className={fieldClass} />
                     </label>
+                    <input name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
+                    {error && <p className="mt-4 text-sm text-red-300">{error}</p>}
                     <button
                       type="submit"
-                      className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-neutral-950"
+                      disabled={sending}
+                      className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-neutral-950 disabled:opacity-60"
                     >
                       <SendIcon />
-                      Send message
+                      {sending ? 'Sending…' : 'Send message'}
                     </button>
                   </form>
                 )}

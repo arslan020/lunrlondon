@@ -37,7 +37,7 @@ const sections = [
     title: 'Who else sees it',
     kicker: 'Sharing',
     paragraphs: [
-      `${siteConfig.brandName} uses enquiry and booking details to respond and arrange the journey. This website does not pass them to a payment company, a call-tracking service, or an advertising network.`,
+      `${siteConfig.brandName} uses enquiry and booking details to respond and arrange the journey. The form sends those details by email to the bookings inbox through Resend. This website does not pass them to a payment company, a call-tracking service, or an advertising network.`,
       'A directions link opens a map on a separate page. What you do there is covered by that map service, not by this policy.',
     ],
   },

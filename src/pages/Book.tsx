@@ -8,6 +8,7 @@ import {
   type TripType,
   type VehicleId,
 } from '../data/pricing'
+import { sendEnquiry } from '../lib/sendEnquiry'
 
 const tripTypes: { id: TripType; label: string }[] = [
   { id: 'one-way', label: 'One Way' },
@@ -35,6 +36,8 @@ function Book() {
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
 
   const quoteOptions = { tripType, hours, airportId, pickup, dropoff, returning }
 
@@ -48,9 +51,38 @@ function Book() {
     setStep(2)
   }
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setSubmitted(true)
+    const website = (event.currentTarget.elements.namedItem('website') as HTMLInputElement | null)?.value ?? ''
+    const vehicle = vehicles.find((item) => item.id === vehicleId)
+    const airport = airports.find((item) => item.id === airportId)
+    setSending(true)
+    setError('')
+    try {
+      await sendEnquiry({
+        kind: 'booking',
+        name,
+        email,
+        phone,
+        trip: tripTypes.find((item) => item.id === tripType)?.label ?? '',
+        airport: tripType === 'airport' ? (airport?.name ?? '') : '',
+        pickup,
+        dropoff: tripType === 'hourly' ? '' : dropoff,
+        date,
+        time,
+        hours: tripType === 'hourly' ? String(hours) : '',
+        returning: returning ? 'Yes' : 'No',
+        vehicle: vehicle?.name ?? '',
+        quote: selectedQuote?.amount != null ? formatPrice(selectedQuote.amount) : '',
+        summary: selectedQuote?.summary ?? '',
+        website,
+      })
+      setSubmitted(true)
+    } catch {
+      setError('We could not send that just now. Please try again in a moment.')
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -226,6 +258,8 @@ function Book() {
                     Email Address
                     <input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className={`${fieldClass} mt-1`} />
                   </label>
+                  <input name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
+                  {error && <p className="text-sm text-red-700">{error}</p>}
 
                   <div className="flex flex-col-reverse gap-3 sm:flex-row">
                     <button type="button" onClick={() => setStep(1)} className="rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold">
@@ -233,9 +267,10 @@ function Book() {
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 rounded-full bg-brand-primary py-3 text-sm font-bold uppercase tracking-[0.12em] text-brand-primary-contrast"
+                      disabled={sending}
+                      className="flex-1 rounded-full bg-brand-primary py-3 text-sm font-bold uppercase tracking-[0.12em] text-brand-primary-contrast disabled:opacity-60"
                     >
-                      Request Booking {selectedQuote?.amount != null ? formatPrice(selectedQuote.amount) : ''}
+                      {sending ? 'Sending…' : `Request Booking ${selectedQuote?.amount != null ? formatPrice(selectedQuote.amount) : ''}`}
                     </button>
                   </div>
                 </form>
