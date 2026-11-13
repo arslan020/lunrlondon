@@ -20,8 +20,9 @@ function Footer() {
             )}
           </Link>
           <p className="mt-4 text-sm leading-relaxed text-neutral-300">
-            {siteConfig.tagline}. Private cars for airport arrivals, one-way journeys, and hourly hire, with a
-            licensed chauffeur and the fare confirmed before you travel. We accept cryptocurrency.
+            From sunrise to moonlight. Luxury never sleeps. {siteConfig.brandName} is available 24 hours a day,
+            7 days a week, for airport arrivals, one-way journeys, and hourly hire, with a licensed chauffeur
+            and the fare confirmed before you travel. We accept cryptocurrency.
           </p>
         </div>
 

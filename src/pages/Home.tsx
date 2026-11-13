@@ -12,9 +12,9 @@ function Home() {
   return (
     <div className="bg-black">
       <PageHero
-        heading="Luxury Chauffeur Service in London & Across the UK"
-        highlight="Luxury"
-        subtext={`${siteConfig.brandName} provides a luxury chauffeur service for clients who expect precision, discretion, and professionalism as standard. Serving business leaders, private individuals, and specialist clients, we deliver refined chauffeured travel designed around comfort, reliability, and peace of mind.`}
+        heading="A Higher Standard of Chauffeuring. Around the Clock."
+        highlight="Around the Clock"
+        subtext="From sunrise to moonlight, experience chauffeur services where excellence has no closing hours."
         video="/videos/hero.mp4"
         image="/images/hero.jpg"
         videoClassName="brightness-[1.18]"
@@ -30,21 +30,27 @@ function Home() {
       <section className="py-12 md:py-20">
         <div className="mx-auto grid max-w-content items-start gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16">
           <h2 className="font-serif text-[clamp(2rem,1.4rem+2.2vw,3rem)] font-medium leading-tight text-white">
-            A <em className="italic text-brand-primary">Luxury</em> Experience Without Compromise
+            Luxury Never <em className="italic text-brand-primary">Sleeps</em>
           </h2>
           <div>
             <p className="leading-relaxed text-neutral-200">
-              Luxury is found in the details. At {siteConfig.brandName}, our Luxury Chauffeur Service is
-              built around creating a calm, comfortable, and effortless experience for every client. Our
-              vehicles are meticulously prepared before every journey, ensuring a pristine environment
-              that reflects the expectations of our clientele. Inside, comfort and refinement take
-              priority. Outside, discretion and professionalism define our presence. This is chauffeuring
-              designed to feel seamless, not intrusive.
+              At {siteConfig.brandName}, we believe true luxury is not simply about where you travel, but
+              how you are treated along the way.
             </p>
             <p className="mt-5 leading-relaxed text-neutral-200">
-              For clients who value privacy, consistency, and attention to detail, our Luxury Chauffeur
-              Service delivers an experience that feels considered from start to finish.
+              Every journey is an opportunity to demonstrate our commitment to trust, reliability, respect
+              and honour. From the moment you make your booking to the moment you reach your destination,
+              we place your comfort, time and confidence at the heart of everything we do.
             </p>
+            <p className="mt-5 leading-relaxed text-neutral-200">
+              Whether travelling for business, leisure or a special occasion, our approach remains
+              unchanged: professional service, considered attention and an unwavering commitment to the
+              highest standards.
+            </p>
+            <p className="mt-5 leading-relaxed text-neutral-200">
+              Available 24 hours a day, 7 days a week, we move with the rhythm of your world.
+            </p>
+            <p className="mt-5 font-serif text-xl text-brand-primary">{siteConfig.brandName}. Luxury Never Sleeps.</p>
             <div className="mt-8">
               <Button to="/contact">Enquire Today</Button>
             </div>
@@ -53,25 +59,21 @@ function Home() {
       </section>
 
       <div className="py-4 md:py-6">
-        <GoldCtaBar text="Contact us today to discuss your travel needs or request a quotation." />
+        <GoldCtaBar text="From sunrise to moonlight. We know luxury never sleeps." />
       </div>
 
       <section className="py-12 md:py-20">
         <div className="mx-auto grid max-w-content items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
           <div>
-            <SectionHeading heading="Reliability You Can Trust" highlight="Reliability" theme="dark" />
+            <SectionHeading heading="Trust Is Our Foundation" highlight="Trust" theme="dark" />
             <p className="mt-6 leading-relaxed text-neutral-200">
-              Time matters. Whether arriving for a meeting, boarding a flight, or attending a private
-              engagement, reliability is fundamental to our Luxury Chauffeur Service.
+              Confidence is earned, never assumed. We understand the responsibility entrusted to us with
+              every booking and approach every journey with integrity, honesty and accountability.
             </p>
             <p className="mt-4 leading-relaxed text-neutral-200">
-              Our chauffeurs operate with precision, planning routes carefully and monitoring conditions
-              to ensure punctual arrivals. For airport journeys, live flight tracking allows us to adapt
-              seamlessly to delays or early arrivals, removing stress from your travel plans.
-            </p>
-            <p className="mt-4 leading-relaxed text-neutral-200">
-              This commitment to reliability ensures clients can travel with confidence, knowing their
-              chauffeur will be ready exactly when required.
+              Reliability is our promise. Your time matters. We place punctuality, preparation and
+              consistency at the centre of our service, ensuring every journey receives the attention it
+              deserves.
             </p>
             <div className="mt-8">
               <Button to="/book">Book With Confidence</Button>
@@ -89,17 +91,16 @@ function Home() {
             className="order-1 min-h-[240px] lg:order-1"
           />
           <div className="order-2">
-            <SectionHeading heading="Professional Chauffeurs You Can Rely On" highlight="Chauffeurs" theme="dark" />
+            <SectionHeading heading="Respect Is Our Standard" highlight="Respect" theme="dark" />
             <p className="mt-6 leading-relaxed text-neutral-200">
-              Every chauffeur representing {siteConfig.brandName} is carefully selected, fully licensed,
-              and professionally trained. Our Luxury Chauffeur Service is delivered by individuals who
-              understand the importance of discretion, presentation, and client care.
+              Every client, every occasion and every destination deserves consideration. We believe in
+              professionalism without exception, discretion without compromise and service without
+              assumption.
             </p>
             <p className="mt-4 leading-relaxed text-neutral-200">
-              Professionalism extends beyond driving. It is reflected in communication, personal conduct,
-              and the ability to adapt to each client&rsquo;s expectations. For specialist requirements,
-              including close protection travel, chauffeurs may hold additional certifications and
-              training. The result is a service that feels calm, capable, and consistently professional.
+              Honour is our principle. We stand by our commitments. Our word carries meaning, our conduct
+              reflects our values, and our responsibility extends beyond simply getting you to your
+              destination.
             </p>
           </div>
         </div>
@@ -132,9 +133,8 @@ function Home() {
               A Fleet <em className="italic text-brand-primary">Designed</em> for Comfort &amp; Flexibility
             </h2>
             <p className="mt-6 leading-relaxed text-neutral-200">
-              Our Luxury Chauffeur Service is supported by a carefully curated fleet of high-end vehicles.
-              From executive cars to larger group transport, including 16-seater vehicles, we provide
-              solutions for both individual and group travel. All vehicles are:
+              The {siteConfig.brandName} fleet is the Mercedes-Benz E-Class, V-Class and S-Class, and the
+              Range Rover. All vehicles are:
             </p>
             <ul className="mt-5 space-y-2 text-sm text-neutral-300">
               {[
@@ -157,8 +157,8 @@ function Home() {
       </section>
 
       <CTASection
-        heading={`Contact ${siteConfig.brandName}`}
-        text="Whether you are planning a single journey or require an ongoing chauffeur solution, we are ready to assist. Our team is available to discuss your requirements, provide accurate quotations, and ensure your journey is handled with the professionalism you expect from a Luxury Chauffeur Service. Contact us today to discuss your travel needs or request a quotation."
+        heading="Whenever the World Calls, LUNR Is Ready."
+        text="From the earliest departure to the latest arrival, experience a service designed around your schedule, your expectations and your peace of mind. Day or night. Every journey. One standard."
         buttonLabel="Contact Us"
         buttonTo="/contact"
       />

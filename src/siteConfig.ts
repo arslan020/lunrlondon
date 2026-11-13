@@ -4,7 +4,7 @@
 export const siteConfig = {
   brandName: 'LUNR',
   logo: '/images/logo.png' as string | null,
-  tagline: 'Luxury Chauffeur Service in London & Across the UK',
+  tagline: 'Luxury Chauffeur Services | Available 24/7',
   phone: '', // add the client's real phone number here
   mobile: '', // add the client's real mobile number here
   email: '', // add the client's real email address here
