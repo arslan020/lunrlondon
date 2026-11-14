@@ -123,7 +123,7 @@ function Contact() {
         </div>
       </section>
 
-      <section className="px-4 py-10 sm:px-6">
+      <section className="py-10 pl-4 pr-16 sm:pl-6 sm:pr-20">
         <div className="mx-auto max-w-content">
           <nav aria-label="Breadcrumb" className="mb-5 text-sm text-neutral-500">
             <Link to="/" className="hover:text-white">
@@ -283,7 +283,7 @@ function Contact() {
         </div>
       </section>
 
-      <section className="px-4 pb-20 pt-6 sm:px-6">
+      <section className="pb-20 pl-4 pr-16 pt-6 sm:pl-6 sm:pr-20">
         <div className="mx-auto max-w-[720px]">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-400">Quick answers</p>
           <h2 className="mt-3 text-[1.7rem] font-semibold uppercase leading-[1.05] tracking-tight sm:text-4xl">

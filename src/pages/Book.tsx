@@ -86,7 +86,7 @@ function Book() {
   }
 
   return (
-    <section className="relative overflow-hidden px-4 pb-16 pt-28 sm:px-6 md:pt-32">
+    <section className="relative overflow-hidden pb-16 pl-4 pr-16 pt-28 sm:pl-6 sm:pr-20 md:pt-32">
       <img src="/images/fleet-night.jpg" alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
       <div className="absolute inset-0 bg-black/25" />
       <div className="relative mx-auto grid w-full min-w-0 max-w-content items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">

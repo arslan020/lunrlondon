@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useState } from 'react'
 import Lenis from 'lenis'
 import Header from './Header'
 import Footer from './Footer'
+import WhatsAppTag from './WhatsAppTag'
 
 let smoothScroll: Lenis | null = null
 
@@ -114,6 +115,7 @@ function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <WhatsAppTag />
       {showTop && (
         <a
           href="#top"
