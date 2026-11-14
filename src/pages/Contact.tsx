@@ -34,13 +34,13 @@ function Contact() {
     cardRef.current?.style.setProperty('--contact-pointer-active', '0')
   }
 
-  const phone = siteConfig.phone || siteConfig.mobile
-  const whatsappHref = phone ? `https://wa.me/${digits(phone).replace(/^\+/, '')}` : ''
+  const whatsappNumber = siteConfig.whatsapp
+  const whatsappHref = whatsappNumber ? `https://wa.me/${digits(whatsappNumber).replace(/^\+/, '')}` : ''
   const emailHref = siteConfig.email ? `mailto:${siteConfig.email}` : ''
   const address = [siteConfig.address.line1, siteConfig.address.line2].filter(Boolean).join(', ')
 
   const channels = [
-    { label: 'WhatsApp', detail: phone ? 'Message the team' : 'Number coming soon', href: whatsappHref, icon: 'whatsapp' as const },
+    { label: 'WhatsApp', detail: whatsappNumber || 'Number coming soon', href: whatsappHref, icon: 'whatsapp' as const },
     { label: 'Email', detail: siteConfig.email || 'Email coming soon', href: emailHref, icon: 'email' as const },
   ]
   const mapsHref = address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}` : ''

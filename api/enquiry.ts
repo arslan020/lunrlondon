@@ -121,6 +121,8 @@ function brandedEmail(options: {
             <tr>
               <td align="center" style="padding:0 32px 28px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#8a8a8a;">
                 Luxury Chauffeur Services · Available 24/7<br>
+                Centre 42, 42 Watling Street, Radlett, Herts, England, WD7 7NN<br>
+                <a href="https://wa.me/447376444833" style="color:#E1BE66;text-decoration:none;">WhatsApp +44 7376 444833</a><br>
                 <a href="https://lunrlondon.co.uk" style="color:#E1BE66;text-decoration:none;">lunrlondon.co.uk</a>
               </td>
             </tr>

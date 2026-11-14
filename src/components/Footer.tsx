@@ -67,6 +67,18 @@ function Footer() {
                 </a>
               </li>
             )}
+            {siteConfig.whatsapp && (
+              <li>
+                <a
+                  className="hover:text-brand-primary"
+                  href={`https://wa.me/${siteConfig.whatsapp.replace(/[^\d]/g, '')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  WhatsApp {siteConfig.whatsapp}
+                </a>
+              </li>
+            )}
             {siteConfig.email && (
               <li>
                 <a className="break-all hover:text-brand-primary" href={`mailto:${siteConfig.email}`}>

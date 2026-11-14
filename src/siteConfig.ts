@@ -7,10 +7,11 @@ export const siteConfig = {
   tagline: 'Luxury Chauffeur Services | Available 24/7',
   phone: '', // add the client's real phone number here
   mobile: '', // add the client's real mobile number here
+  whatsapp: '+44 7376 444833',
   email: 'bookings@lunrlondon.co.uk',
   address: {
-    line1: 'Your Business Address',
-    line2: 'Your City, Postcode',
+    line1: 'Centre 42, 42 Watling Street',
+    line2: 'Radlett, Herts, England, WD7 7NN',
   },
   googleReviewsUrl: '#',
   privacyPolicyUrl: '/privacy-policy',

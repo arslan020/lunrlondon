@@ -8,7 +8,7 @@ const sections = [
     title: 'Who is responsible',
     kicker: 'The controller for your information',
     paragraphs: [
-      `${siteConfig.brandName} is responsible for the personal information collected on this website when you ask about a journey or request a booking.`,
+      `${siteConfig.brandName} is responsible for the personal information collected on this website when you ask about a journey or request a booking. The registered address is ${siteConfig.address.line1}, ${siteConfig.address.line2}.`,
       siteConfig.email
         ? `A privacy question can be sent to ${siteConfig.email}, or through the contact page. Include enough detail for us to find the enquiry or booking, and leave out sensitive information we do not need.`
         : 'A privacy question can be sent through the contact page. Include enough detail for us to find the enquiry or booking, and leave out sensitive information we do not need.',
