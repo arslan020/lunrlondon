@@ -137,8 +137,9 @@ export const services: ServiceData[] = [
       {
         heading: 'One Destination. One Refined Experience.',
         highlight: 'One Destination',
-        image: '/images/rr-vip.jpg',
+        image: '/images/v-class-eye.jpg',
         imageFit: 'contain',
+        imageRatio: 'aspect-video',
         paragraphs: [
           'Whether travelling across London, between cities or to a destination further afield, our one-way transfer service is designed to make every journey effortless.',
           'We place emphasis on preparation, punctuality and a smooth, comfortable experience from collection to arrival. No unnecessary complications. No compromise in standards. Just a professional chauffeur service focused on getting you where you need to be.',
