@@ -54,7 +54,7 @@ function PageHero({
     <section
       className={
         natural
-          ? 'relative min-h-[100svh] overflow-hidden bg-neutral-950 lg:min-h-0'
+          ? 'relative min-h-[100svh] overflow-hidden bg-neutral-950'
           : 'relative flex min-h-[100svh] items-end overflow-hidden bg-neutral-950'
       }
     >
@@ -72,7 +72,7 @@ function PageHero({
         <img
           src={image ?? ''}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover object-center brightness-110 lg:static lg:h-auto lg:w-full lg:object-contain"
+          className="absolute inset-0 h-full w-full object-cover object-center brightness-110"
         />
       ) : image ? (
         <img src={image} alt="" className={`absolute inset-0 h-full w-full brightness-110 ${imageFit === 'contain' ? 'object-contain' : 'object-cover'} ${imagePosition}`} />

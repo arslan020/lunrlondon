@@ -67,19 +67,30 @@ function Home() {
           <div>
             <SectionHeading heading="Trust Is Our Foundation" highlight="Trust" theme="dark" />
             <p className="mt-6 leading-relaxed text-neutral-200">
-              Confidence is earned, never assumed. We understand the responsibility entrusted to us with
-              every booking and approach every journey with integrity, honesty and accountability.
+              Confidence is earned, never assumed. Whether you're travelling for business or pleasure, we
+              treat every booking as a responsibility, and every journey with integrity, honesty and
+              accountability.
             </p>
             <p className="mt-4 leading-relaxed text-neutral-200">
-              Reliability is our promise. Your time matters. We place punctuality, preparation and
-              consistency at the centre of our service, ensuring every journey receives the attention it
-              deserves.
+              From private and commercial airport transfers to executive chauffeur travel and close
+              protection, our service is built around three things: your time, your privacy and your peace
+              of mind.
+            </p>
+            <h3 className="mt-6 font-serif text-2xl italic text-brand-primary">Your time matters.</h3>
+            <p className="mt-3 leading-relaxed text-neutral-200">
+              Punctuality, preparation and consistency sit at the centre of everything we do. Flights are
+              monitored, routes are planned in advance, and your chauffeur is ready when you are.
+            </p>
+            <h3 className="mt-6 font-serif text-2xl italic text-brand-primary">Discretion is guaranteed.</h3>
+            <p className="mt-3 leading-relaxed text-neutral-200">
+              Our chauffeurs and security professionals are trained to be professional, unobtrusive and
+              respectful of your confidentiality, at all times and in every setting.
             </p>
             <div className="mt-8">
               <Button to="/book">Book With Confidence</Button>
             </div>
           </div>
-          <ImagePlaceholder label="Range Rover" src="/images/rr-country.jpg" className="min-h-[240px]" />
+          <ImagePlaceholder label="Mercedes-Benz S-Class at the airport" src="/images/s-class-airport.jpg" className="min-h-[240px]" />
         </div>
       </section>
 

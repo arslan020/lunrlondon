@@ -19,7 +19,7 @@ const tripTypes: { id: TripType; label: string }[] = [
 const fareCell = (amount?: number) => (amount != null ? formatPrice(amount) : '—')
 
 const fieldClass =
-  'w-full min-w-0 max-w-full rounded-md border border-neutral-300 bg-white px-3 py-3 text-base text-neutral-900 outline-none focus:border-neutral-900'
+  'w-full min-w-0 max-w-full border-0 border-b border-white/30 bg-transparent px-0 py-3 text-base text-white outline-none placeholder:text-white/40 focus:border-brand-primary [color-scheme:dark]'
 
 function Book() {
   const [step, setStep] = useState<1 | 2>(1)
@@ -86,13 +86,15 @@ function Book() {
   }
 
   return (
-    <section className="bg-black px-4 pb-16 pt-28 sm:px-6 md:pt-32">
-      <div className="mx-auto grid w-full min-w-0 max-w-content items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
-        <div className="min-w-0 rounded-2xl bg-white p-4 text-neutral-900 shadow-2xl sm:p-6" style={{ colorScheme: 'light' }}>
+    <section className="relative overflow-hidden px-4 pb-16 pt-28 sm:px-6 md:pt-32">
+      <img src="/images/fleet-night.jpg" alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
+      <div className="absolute inset-0 bg-black/25" />
+      <div className="relative mx-auto grid w-full min-w-0 max-w-content items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
+        <div className="min-w-0 rounded-2xl border border-white/20 bg-black/35 p-4 text-white shadow-2xl backdrop-blur-md sm:p-6" style={{ colorScheme: 'dark' }}>
           {submitted ? (
             <div className="px-2 py-10 text-center">
-              <h1 className="font-serif text-4xl text-neutral-900">Request received</h1>
-              <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-neutral-600">
+              <h1 className="font-serif text-4xl text-white">Request received</h1>
+              <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/70">
                 Thank you{name ? `, ${name}` : ''}. We have your {tripTypes.find((item) => item.id === tripType)?.label.toLowerCase()}{' '}
                 request
                 {selectedQuote?.amount != null ? ` at ${formatPrice(selectedQuote.amount)}` : ''}. A member of the team will confirm it shortly.
@@ -101,15 +103,15 @@ function Book() {
           ) : (
             <>
               <ol className="mb-6 flex w-full min-w-0 items-center gap-2 text-xs font-semibold sm:gap-3 sm:text-sm">
-                <li className="flex min-w-0 items-center gap-2 text-neutral-900">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xs text-white">1</span>
+                <li className="flex min-w-0 items-center gap-2 text-white">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-primary text-xs text-brand-primary-contrast">1</span>
                   <span className="truncate">Journey Details</span>
                 </li>
-                <span className="h-px flex-1 bg-neutral-200" />
-                <li className={`flex shrink-0 items-center gap-2 ${step === 2 ? 'text-neutral-900' : 'text-neutral-400'}`}>
+                <span className="h-px flex-1 bg-white/20" />
+                <li className={`flex shrink-0 items-center gap-2 ${step === 2 ? 'text-white' : 'text-white/40'}`}>
                   <span
                     className={`flex h-7 w-7 items-center justify-center rounded-full text-xs ${
-                      step === 2 ? 'bg-neutral-900 text-white' : 'border border-neutral-300'
+                      step === 2 ? 'bg-brand-primary text-brand-primary-contrast' : 'border border-white/30'
                     }`}
                   >
                     2
@@ -120,14 +122,14 @@ function Book() {
 
               {step === 1 ? (
                 <form onSubmit={goNext} className="space-y-4">
-                  <div className="grid min-w-0 grid-cols-3 border-b border-neutral-200">
+                  <div className="flex flex-wrap gap-2">
                     {tripTypes.map((type) => (
                       <button
                         key={type.id}
                         type="button"
                         onClick={() => setTripType(type.id)}
-                        className={`min-w-0 whitespace-normal px-1 pb-3 text-center text-[11px] font-semibold leading-tight sm:text-sm ${
-                          tripType === type.id ? 'border-b-2 border-[#c4a15a] text-neutral-900' : 'text-neutral-500'
+                        className={`rounded-full px-4 py-2 text-[11px] font-semibold sm:text-sm ${
+                          tripType === type.id ? 'border border-white/50 bg-white/15 text-white' : 'text-white/55'
                         }`}
                       >
                         {type.label}
@@ -140,7 +142,7 @@ function Book() {
                       Airport
                       <select className={`${fieldClass} mt-1`} value={airportId} onChange={(event) => setAirportId(event.target.value)} required>
                         {airports.map((airport) => (
-                          <option key={airport.id} value={airport.id}>
+                          <option key={airport.id} value={airport.id} className="bg-neutral-950 text-white">
                             {airport.name}
                           </option>
                         ))}
@@ -194,7 +196,7 @@ function Book() {
                         onChange={(event) => setHours(Number(event.target.value))}
                         className={`${fieldClass} mt-1`}
                       />
-                      <span className="mt-1 block text-xs font-normal text-neutral-500">{minimumHours}-hour minimum</span>
+                      <span className="mt-1 block text-xs font-normal text-white/50">{minimumHours}-hour minimum</span>
                     </label>
                   )}
 
@@ -209,7 +211,7 @@ function Book() {
 
                   <button
                     type="submit"
-                    className="mt-2 w-full rounded-full bg-neutral-950 py-4 text-sm font-bold uppercase tracking-[0.14em] text-white"
+                    className="mt-2 w-full rounded-full border border-white/25 bg-white/15 py-4 text-sm font-bold uppercase tracking-[0.14em] text-white backdrop-blur"
                   >
                     Go Next
                   </button>
@@ -226,23 +228,23 @@ function Book() {
                           type="button"
                           onClick={() => setVehicleId(vehicle.id)}
                           className={`flex min-w-0 items-center gap-3 rounded-xl border p-3 text-left ${
-                            selected ? 'border-neutral-900 bg-neutral-50' : 'border-neutral-200'
+                            selected ? 'border-brand-primary bg-white/15' : 'border-white/15 bg-white/5'
                           }`}
                         >
-                          <img src={vehicle.image} alt="" className="h-14 w-16 shrink-0 rounded-lg bg-neutral-100 object-contain sm:h-16 sm:w-20" />
+                          <img src={vehicle.image} alt="" className="h-14 w-16 shrink-0 rounded-lg bg-neutral-200 object-contain sm:h-16 sm:w-20" />
                           <span className="min-w-0 flex-1">
                             <span className="block font-semibold">{vehicle.shortName}</span>
-                            <span className="block text-xs text-neutral-500">
+                            <span className="block text-xs text-white/50">
                               {vehicle.seats} · {formatPrice(vehicle.hourly)}/hour
                             </span>
                           </span>
-                          <span className="shrink-0 font-serif text-xl sm:text-2xl">{quote?.amount != null ? formatPrice(quote.amount) : 'Quote'}</span>
+                          <span className="shrink-0 font-serif text-xl text-brand-primary sm:text-2xl">{quote?.amount != null ? formatPrice(quote.amount) : 'Quote'}</span>
                         </button>
                       )
                     })}
                   </div>
 
-                  {selectedQuote && <p className="text-sm text-neutral-600">{selectedQuote.summary}</p>}
+                  {selectedQuote && <p className="text-sm text-white/70">{selectedQuote.summary}</p>}
 
                   <div className="grid min-w-0 gap-4 sm:grid-cols-2">
                     <label className="block text-sm font-medium">
@@ -259,10 +261,10 @@ function Book() {
                     <input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className={`${fieldClass} mt-1`} />
                   </label>
                   <input name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
-                  {error && <p className="text-sm text-red-700">{error}</p>}
+                  {error && <p className="text-sm text-red-300">{error}</p>}
 
                   <div className="flex flex-col-reverse gap-3 sm:flex-row">
-                    <button type="button" onClick={() => setStep(1)} className="rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold">
+                    <button type="button" onClick={() => setStep(1)} className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white">
                       Back
                     </button>
                     <button
@@ -279,7 +281,7 @@ function Book() {
           )}
         </div>
 
-        <aside className="min-w-0 rounded-2xl border border-white/10 bg-[#141413] p-5 text-white sm:p-6">
+        <aside className="min-w-0 rounded-2xl border border-white/20 bg-black/35 p-5 text-white backdrop-blur-md sm:p-6">
           <h2 className="font-serif text-3xl">Price list</h2>
           <p className="mt-2 text-sm leading-relaxed text-neutral-400">
             Hourly hire is charged per hour. Airport fares are fixed from central London. A return booking doubles the fare. We accept cryptocurrency.

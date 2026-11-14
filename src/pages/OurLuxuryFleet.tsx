@@ -6,9 +6,9 @@ import Button from '../components/Button'
 import { formatPrice, vehicles, type VehicleId } from '../data/pricing'
 
 const cardImagePosition: Record<VehicleId, string> = {
-  'e-class': 'object-[center_88%]',
+  'e-class': 'object-center',
   'v-class': 'object-center',
-  'range-rover': 'object-[center_78%]',
+  'range-rover': 'object-center',
   's-class': 'object-center',
 }
 
@@ -21,8 +21,9 @@ function OurLuxuryFleet() {
         subtext="Our vehicles are chosen for comfort, refinement, and reliability. Every journey is presented in a meticulously prepared car, driven by a licensed chauffeur."
         buttonLabel="Choose Your Vehicle"
         buttonTo="/book"
-        image="/images/fleet-lineup.jpg"
+        image="/images/fleet-night.jpg"
         imageFit="natural"
+        scrim="soft"
       />
 
       <section className="py-12 md:py-20">
