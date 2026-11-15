@@ -22,10 +22,12 @@ export async function toRequest(req: IncomingMessage) {
   }
 
   let body: Buffer | string | undefined
+  const contentType = headers.get('content-type') ?? ''
   const parsed = (req as IncomingMessage & { body?: unknown }).body
-  if (parsed != null && (typeof parsed === 'string' || (typeof parsed === 'object' && !Buffer.isBuffer(parsed)))) {
+  if (contentType.includes('application/json') && parsed != null && !Buffer.isBuffer(parsed)) {
     body = typeof parsed === 'string' ? parsed : JSON.stringify(parsed)
-    if (!headers.has('content-type')) headers.set('content-type', 'application/json')
+  } else if (Buffer.isBuffer(parsed)) {
+    body = parsed
   } else {
     const chunks: Buffer[] = []
     for await (const chunk of req) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))

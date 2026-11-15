@@ -28,7 +28,15 @@ export function databaseUrl() {
 }
 
 export function blobToken() {
-  return readEnv('BLOB_READ_WRITE_TOKEN', 'Blob_READ_WRITE_TOKEN')
+  const named = readEnv('BLOB_READ_WRITE_TOKEN', 'Blob_READ_WRITE_TOKEN')
+  if (named) return named
+  for (const [key, value] of Object.entries(process.env)) {
+    if (!value) continue
+    const trimmed = value.trim()
+    if (trimmed.startsWith('vercel_blob_rw_')) return trimmed
+    if (/BLOB/i.test(key) && /TOKEN/i.test(key) && trimmed.length > 20) return trimmed
+  }
+  return ''
 }
 
 function getSql() {

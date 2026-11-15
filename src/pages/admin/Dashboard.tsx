@@ -28,7 +28,7 @@ function Dashboard() {
   const [serviceIndex, setServiceIndex] = useState(0)
 
   useEffect(() => {
-    fetch('/api/admin/content')
+    fetch('/api/admin/content', { credentials: 'include' })
       .then(async (response) => {
         if (response.status === 401) {
           navigate('/admin/login')
@@ -51,6 +51,7 @@ function Dashboard() {
     setStatus('')
     const response = await fetch('/api/admin/content', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(next),
     })
@@ -65,13 +66,13 @@ function Dashboard() {
   }
 
   async function uploadFile(file: File) {
-    const probe = await fetch('/api/admin/upload')
+    const probe = await fetch('/api/admin/upload', { credentials: 'include' })
     if (probe.status === 401) {
       navigate('/admin/login')
       throw new Error('Log in again.')
     }
-    const info = (await probe.json().catch(() => null)) as { blob?: boolean } | null
-    if (info?.blob) {
+    const info = (await probe.json().catch(() => null)) as { mode?: string } | null
+    if (info?.mode === 'client') {
       const blob = await upload(file.name, file, {
         access: 'public',
         handleUploadUrl: '/api/admin/blob',
@@ -82,7 +83,7 @@ function Dashboard() {
     }
     const body = new FormData()
     body.append('file', file)
-    const response = await fetch('/api/admin/upload', { method: 'POST', body })
+    const response = await fetch('/api/admin/upload', { method: 'POST', body, credentials: 'include' })
     const data = (await response.json().catch(() => null)) as { url?: string; error?: string } | null
     if (!response.ok || !data?.url) throw new Error(data?.error || 'Upload failed.')
     return data.url
@@ -131,7 +132,7 @@ function Dashboard() {
               type="button"
               className="rounded-full bg-brand-primary px-4 py-2 text-sm font-bold text-brand-primary-contrast"
               onClick={async () => {
-                await fetch('/api/admin/logout', { method: 'POST' })
+                await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' })
                 navigate('/admin/login')
               }}
             >

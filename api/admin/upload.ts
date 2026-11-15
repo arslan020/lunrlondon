@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { put } from '@vercel/blob'
 import { hasSession } from '../auth.ts'
 import { json, send, toRequest } from '../http.ts'
 import { blobToken } from '../store.ts'
@@ -29,16 +30,20 @@ function extension(type: string, name: string) {
   return '.jpg'
 }
 
+function uploadMode() {
+  if (blobToken()) return 'client'
+  if (process.env.VERCEL === '1') return 'server'
+  return 'local'
+}
+
 export async function GET(request: Request) {
   if (!hasSession(request)) return json({ error: 'Unauthorized' }, 401)
-  return json({ blob: Boolean(blobToken()) })
+  const mode = uploadMode()
+  return json({ mode, blob: mode !== 'local' })
 }
 
 export async function POST(request: Request) {
   if (!hasSession(request)) return json({ error: 'Unauthorized' }, 401)
-  if (process.env.VERCEL === '1') {
-    return json({ error: 'Connect Vercel Blob in the Storage tab, then redeploy. Photos and videos are stored there.' }, 500)
-  }
 
   const form = await request.formData().catch(() => null)
   const file = form?.get('file')
@@ -47,6 +52,25 @@ export async function POST(request: Request) {
   if (file.size > MAX_BYTES) return json({ error: 'Keep the file under 80MB.' }, 413)
 
   const safeName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${extension(file.type, file.name)}`
+
+  if (process.env.VERCEL === '1') {
+    if (file.size > 4_500_000 && !blobToken()) {
+      return json({ error: 'That file is too large for this upload. Use a photo under 4MB, or a shorter video.' }, 413)
+    }
+    try {
+      const token = blobToken()
+      const blob = await put(`uploads/${safeName}`, Buffer.from(await file.arrayBuffer()), {
+        access: 'public',
+        addRandomSuffix: true,
+        ...(token ? { token } : {}),
+      })
+      return json({ url: blob.url })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Upload failed.'
+      return json({ error: message }, 500)
+    }
+  }
+
   const dir = path.join(process.cwd(), 'public', 'uploads')
   await mkdir(dir, { recursive: true })
   await writeFile(path.join(dir, safeName), Buffer.from(await file.arrayBuffer()))

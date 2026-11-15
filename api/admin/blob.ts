@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client'
 import { hasSession } from '../auth.ts'
 import { json, send, toRequest } from '../http.ts'
+import { blobToken } from '../store.ts'
 
 const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif', 'video/mp4', 'video/webm', 'video/quicktime']
 
@@ -10,9 +11,11 @@ export async function POST(request: Request) {
   if (!body || typeof body !== 'object' || !('type' in body)) return json({ error: 'Invalid upload.' }, 400)
 
   try {
+    const token = blobToken()
     const result = await handleUpload({
       body,
       request,
+      ...(token ? { token } : {}),
       onBeforeGenerateToken: async () => {
         if (!hasSession(request)) throw new Error('Unauthorized')
         return {

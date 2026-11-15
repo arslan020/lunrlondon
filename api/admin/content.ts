@@ -8,7 +8,11 @@ const MAX_BYTES = 1_500_000
 export async function GET(request: Request) {
   if (!hasSession(request)) return json({ error: 'Unauthorized' }, 401)
   try {
-    return json({ content: await readContent(), storageConfigured: isStorageConfigured(), blob: Boolean(blobToken()) })
+    return json({
+      content: await readContent(),
+      storageConfigured: isStorageConfigured(),
+      blob: Boolean(blobToken()) || process.env.VERCEL === '1',
+    })
   } catch (error) {
     console.error(error)
     return json({ error: 'The saved content could not be loaded.' }, 500)
