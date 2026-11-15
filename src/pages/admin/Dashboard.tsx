@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { upload } from '@vercel/blob/client'
+import { DEFAULT_CONTENT } from '../../content/defaults'
 import { mergeContent } from '../../content/merge'
 import type { SiteContent } from '../../content/types'
 import type { VehicleId } from '../../data/pricing'
@@ -11,6 +12,59 @@ const PAGE_TABS = ['Site', 'Home', 'Services', 'Fleet', 'Prices', 'FAQs', 'Revie
 
 function serviceTabId(slug: string) {
   return `service:${slug}`
+}
+
+const REMOVED_MEDIA = 'lunr-removed-media'
+
+function readRemoved() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(REMOVED_MEDIA) || '{}') as unknown
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+    return Object.fromEntries(
+      Object.entries(parsed).filter((entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1].length > 0),
+    )
+  } catch {
+    return {}
+  }
+}
+
+function writeRemoved(value: Record<string, string>) {
+  try {
+    localStorage.setItem(REMOVED_MEDIA, JSON.stringify(value))
+  } catch {
+    // The photo can still be restored from the original until the page is closed.
+  }
+}
+
+const REMOVED_SECTIONS = 'lunr-removed-sections'
+
+type StashedSection = {
+  id: string
+  slug: string
+  index: number
+  section: ServiceFeatureSection
+}
+
+function readStashedSections() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(REMOVED_SECTIONS) || '[]') as unknown
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter((item): item is StashedSection => {
+      if (!item || typeof item !== 'object') return false
+      const row = item as StashedSection
+      return typeof row.id === 'string' && typeof row.slug === 'string' && typeof row.index === 'number' && !!row.section && typeof row.section.heading === 'string' && Array.isArray(row.section.paragraphs)
+    })
+  } catch {
+    return []
+  }
+}
+
+function writeStashedSections(value: StashedSection[]) {
+  try {
+    localStorage.setItem(REMOVED_SECTIONS, JSON.stringify(value))
+  } catch {
+    // The section can still be restored from the original until the page is closed.
+  }
 }
 const mediaAccept = 'image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime'
 const imageAccept = 'image/jpeg,image/png,image/webp,image/gif'
@@ -29,6 +83,8 @@ function Dashboard() {
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState('')
+  const [removed, setRemoved] = useState<Record<string, string>>(readRemoved)
+  const [stashedSections, setStashedSections] = useState<StashedSection[]>(readStashedSections)
 
   useEffect(() => {
     fetch('/api/admin/content', { credentials: 'include' })
@@ -92,12 +148,39 @@ function Dashboard() {
     return data.url
   }
 
-  async function clearMedia(apply: (current: SiteContent, url: string) => SiteContent) {
+  function rememberRemoved(key: string, url: string) {
+    if (!url) return
+    const next = { ...removed, [key]: url }
+    setRemoved(next)
+    writeRemoved(next)
+  }
+
+  function forgetRemoved(key: string) {
+    if (!removed[key]) return
+    const next = { ...removed }
+    delete next[key]
+    setRemoved(next)
+    writeRemoved(next)
+  }
+
+  async function clearMedia(key: string, value: string, apply: (current: SiteContent, url: string) => SiteContent) {
     setError('')
     setStatus('')
+    rememberRemoved(key, value)
     const next = apply(content as SiteContent, '')
     setContent(next)
-    await persist(next, 'Photo removed. Upload a new one when you are ready.')
+    await persist(next, 'Photo removed. Reset brings it back.')
+  }
+
+  async function restoreMedia(key: string, fallback: string, apply: (current: SiteContent, url: string) => SiteContent) {
+    const url = removed[key] || fallback
+    if (!url) return
+    setError('')
+    setStatus('')
+    const next = apply(content as SiteContent, url)
+    setContent(next)
+    const saved = await persist(next, 'Photo restored.')
+    if (saved) forgetRemoved(key)
   }
 
   async function changeMedia(key: string, file: File, apply: (current: SiteContent, url: string) => SiteContent) {
@@ -136,13 +219,62 @@ function Dashboard() {
       sections: service.sections.map((section, index) => (index === sectionIndex ? { ...section, ...patch } : section)),
     })
   }
-  const bindMedia = (key: string, value: string, accept: string, apply: (current: SiteContent, url: string) => SiteContent) => ({
+  const removedForService = service ? stashedSections.filter((item) => item.slug === service.slug) : []
+  const originalSections = service ? DEFAULT_CONTENT.services.find((item) => item.slug === service.slug)?.sections ?? [] : []
+  const missingSections = service && service.sections.length < originalSections.length
+    ? originalSections.filter((section) => !service.sections.some((item) => item.heading === section.heading) && !removedForService.some((item) => item.section.heading === section.heading))
+    : []
+  const replaceServiceSections = (sections: ServiceFeatureSection[]) => {
+    if (!service) return content
+    return {
+      ...content,
+      services: content.services.map((item) => (item.slug === service.slug ? { ...item, sections } : item)),
+    }
+  }
+  const removeServiceSection = async (sectionIndex: number) => {
+    if (!service) return
+    const section = service.sections[sectionIndex]
+    if (!section) return
+    const nextStash = [...stashedSections, { id: `${service.slug}-${Date.now()}-${sectionIndex}`, slug: service.slug, index: sectionIndex, section }]
+    setStashedSections(nextStash)
+    writeStashedSections(nextStash)
+    const next = replaceServiceSections(service.sections.filter((_, index) => index !== sectionIndex))
+    setContent(next)
+    await persist(next, 'Section removed. Reset brings it back.')
+  }
+  const restoreStashedSection = async (id: string) => {
+    if (!service) return
+    const stashed = stashedSections.find((item) => item.id === id && item.slug === service.slug)
+    if (!stashed) return
+    const sections = [...service.sections]
+    sections.splice(Math.min(stashed.index, sections.length), 0, stashed.section)
+    const next = replaceServiceSections(sections)
+    setContent(next)
+    const saved = await persist(next, 'Section restored.')
+    if (!saved) return
+    const remaining = stashedSections.filter((item) => item.id !== id)
+    setStashedSections(remaining)
+    writeStashedSections(remaining)
+  }
+  const restoreDefaultSection = async (heading: string) => {
+    if (!service) return
+    const index = originalSections.findIndex((item) => item.heading === heading)
+    const section = originalSections[index]
+    if (!section) return
+    const sections = [...service.sections]
+    sections.splice(index < 0 ? sections.length : Math.min(index, sections.length), 0, structuredClone(section))
+    const next = replaceServiceSections(sections)
+    setContent(next)
+    await persist(next, 'Section restored.')
+  }
+  const bindMedia = (key: string, value: string, accept: string, fallback: string, apply: (current: SiteContent, url: string) => SiteContent) => ({
     accept,
     value,
     uploading: uploading === key,
     onChange: (url: string) => setContent(apply(content, url)),
     onUpload: (file: File) => changeMedia(key, file, apply),
-    onRemove: () => clearMedia(apply),
+    onRemove: () => clearMedia(key, value, apply),
+    onReset: !value && (removed[key] || fallback) ? () => restoreMedia(key, fallback, apply) : undefined,
   })
 
   return (
@@ -193,7 +325,7 @@ function Dashboard() {
           <Section title="Site">
             <Field label="Brand name" value={content.site.brandName} onChange={(brandName) => setContent({ ...content, site: { ...content.site, brandName } })} />
             <Field label="Tagline" value={content.site.tagline} onChange={(tagline) => setContent({ ...content, site: { ...content.site, tagline } })} />
-            <MediaField label="Logo" {...bindMedia('logo', content.site.logo, imageAccept, (current, url) => ({ ...current, site: { ...current.site, logo: url } }))} />
+            <MediaField label="Logo" {...bindMedia('logo', content.site.logo, imageAccept, DEFAULT_CONTENT.site.logo, (current, url) => ({ ...current, site: { ...current.site, logo: url } }))} />
             <Field label="WhatsApp" value={content.site.whatsapp} onChange={(whatsapp) => setContent({ ...content, site: { ...content.site, whatsapp } })} />
             <Field label="Phone" value={content.site.phone} onChange={(phone) => setContent({ ...content, site: { ...content.site, phone } })} />
             <Field label="Mobile" value={content.site.mobile} onChange={(mobile) => setContent({ ...content, site: { ...content.site, mobile } })} />
@@ -212,7 +344,7 @@ function Dashboard() {
               <Field label="Heading" value={content.home.heroHeading} onChange={(heroHeading) => setContent({ ...content, home: { ...content.home, heroHeading } })} />
               <Field label="Gold words" value={content.home.heroHighlight} onChange={(heroHighlight) => setContent({ ...content, home: { ...content.home, heroHighlight } })} />
               <Area label="Subtext" value={content.home.heroSubtext} onChange={(heroSubtext) => setContent({ ...content, home: { ...content.home, heroSubtext } })} rows={3} />
-              <MediaField label="Hero video" {...bindMedia('hero-video', content.home.heroVideo, mediaAccept, (current, url) => ({ ...current, home: { ...current.home, heroVideo: url } }))} />
+              <MediaField label="Hero video" {...bindMedia('hero-video', content.home.heroVideo, mediaAccept, DEFAULT_CONTENT.home.heroVideo, (current, url) => ({ ...current, home: { ...current.home, heroVideo: url } }))} />
             </Section>
             <Section title="Intro">
               <Field label="Heading" value={content.home.luxuryHeading} onChange={(luxuryHeading) => setContent({ ...content, home: { ...content.home, luxuryHeading } })} />
@@ -229,11 +361,11 @@ function Dashboard() {
               <Area label="Time text" value={content.home.trustTimeText} onChange={(trustTimeText) => setContent({ ...content, home: { ...content.home, trustTimeText } })} />
               <Field label="Discretion heading" value={content.home.trustDiscretionHeading} onChange={(trustDiscretionHeading) => setContent({ ...content, home: { ...content.home, trustDiscretionHeading } })} />
               <Area label="Discretion text" value={content.home.trustDiscretionText} onChange={(trustDiscretionText) => setContent({ ...content, home: { ...content.home, trustDiscretionText } })} />
-              <MediaField label="Trust photo" {...bindMedia('trust', content.home.trustImage, imageAccept, (current, url) => ({ ...current, home: { ...current.home, trustImage: url } }))} />
+              <MediaField label="Trust photo" {...bindMedia('trust', content.home.trustImage, imageAccept, DEFAULT_CONTENT.home.trustImage, (current, url) => ({ ...current, home: { ...current.home, trustImage: url } }))} />
               <Field label="Respect heading" value={content.home.respectHeading} onChange={(respectHeading) => setContent({ ...content, home: { ...content.home, respectHeading } })} />
               <Field label="Respect gold words" value={content.home.respectHighlight} onChange={(respectHighlight) => setContent({ ...content, home: { ...content.home, respectHighlight } })} />
               <Lines label="Respect paragraphs" value={content.home.respectParagraphs} onChange={(respectParagraphs) => setContent({ ...content, home: { ...content.home, respectParagraphs } })} />
-              <MediaField label="Respect photo" {...bindMedia('respect', content.home.respectImage, imageAccept, (current, url) => ({ ...current, home: { ...current.home, respectImage: url } }))} />
+              <MediaField label="Respect photo" {...bindMedia('respect', content.home.respectImage, imageAccept, DEFAULT_CONTENT.home.respectImage, (current, url) => ({ ...current, home: { ...current.home, respectImage: url } }))} />
             </Section>
             <Section title="Reviews, fleet and close">
               <Field label="Reviews heading" value={content.home.reviewsHeading} onChange={(reviewsHeading) => setContent({ ...content, home: { ...content.home, reviewsHeading } })} />
@@ -244,7 +376,7 @@ function Dashboard() {
               <Area label="Fleet text" value={content.home.fleetText} onChange={(fleetText) => setContent({ ...content, home: { ...content.home, fleetText } })} />
               <Lines label="Fleet points" value={content.home.fleetBullets} onChange={(fleetBullets) => setContent({ ...content, home: { ...content.home, fleetBullets } })} />
               <Field label="Fleet note" value={content.home.fleetNote} onChange={(fleetNote) => setContent({ ...content, home: { ...content.home, fleetNote } })} />
-              <MediaField label="Fleet photo" {...bindMedia('home-fleet', content.home.fleetImage, imageAccept, (current, url) => ({ ...current, home: { ...current.home, fleetImage: url } }))} />
+              <MediaField label="Fleet photo" {...bindMedia('home-fleet', content.home.fleetImage, imageAccept, DEFAULT_CONTENT.home.fleetImage, (current, url) => ({ ...current, home: { ...current.home, fleetImage: url } }))} />
               <Field label="Closing heading" value={content.home.closingHeading} onChange={(closingHeading) => setContent({ ...content, home: { ...content.home, closingHeading } })} />
               <Area label="Closing text" value={content.home.closingText} onChange={(closingText) => setContent({ ...content, home: { ...content.home, closingText } })} />
             </Section>
@@ -268,9 +400,9 @@ function Dashboard() {
               <Field label="Hero heading" value={service.heroHeading} onChange={(heroHeading) => updateService({ heroHeading })} />
               <Field label="Gold words" value={service.heroHighlight ?? ''} onChange={(heroHighlight) => updateService({ heroHighlight })} />
               <Area label="Hero subtext" value={service.heroSubtext} onChange={(heroSubtext) => updateService({ heroSubtext })} />
-              <MediaField label="Hero photo" {...bindMedia(`hero-${service.slug}`, service.heroImage ?? '', imageAccept, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, heroImage: url } : item) }))} />
-              <MediaField label="Hero video" {...bindMedia(`video-${service.slug}`, service.heroVideo ?? '', mediaAccept, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, heroVideo: url } : item) }))} />
-              <MediaField label="Card photo" {...bindMedia(`card-${service.slug}`, service.cardImage ?? '', imageAccept, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, cardImage: url } : item) }))} />
+              <MediaField label="Hero photo" {...bindMedia(`hero-${service.slug}`, service.heroImage ?? '', imageAccept, DEFAULT_CONTENT.services.find((item) => item.slug === service.slug)?.heroImage ?? '', (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, heroImage: url } : item) }))} />
+              <MediaField label="Hero video" {...bindMedia(`video-${service.slug}`, service.heroVideo ?? '', mediaAccept, DEFAULT_CONTENT.services.find((item) => item.slug === service.slug)?.heroVideo ?? '', (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, heroVideo: url } : item) }))} />
+              <MediaField label="Card photo" {...bindMedia(`card-${service.slug}`, service.cardImage ?? '', imageAccept, DEFAULT_CONTENT.services.find((item) => item.slug === service.slug)?.cardImage ?? '', (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, cardImage: url } : item) }))} />
               <p className="text-sm text-white/60">Hero photo is the large photo at the top of this service page. Card photo is the tile on the services list. Uploading one does not change the other.</p>
               <Field label="Closing heading" value={service.closingHeading} onChange={(closingHeading) => updateService({ closingHeading })} />
               <Area label="Closing text" value={service.closingText} onChange={(closingText) => updateService({ closingText })} />
@@ -282,13 +414,29 @@ function Dashboard() {
                 <Field label="Gold words" value={section.highlight ?? ''} onChange={(highlight) => updateSection(sectionIndex, { highlight })} />
                 <Lines label="Paragraphs, one per line" value={section.paragraphs} onChange={(paragraphs) => updateSection(sectionIndex, { paragraphs })} rows={6} />
                 <Lines label="Bullet points, one per line" value={section.bullets ?? []} onChange={(bullets) => updateSection(sectionIndex, { bullets })} />
-                <MediaField label="Photo" {...bindMedia(`${service.slug}-section-${sectionIndex}`, section.image ?? '', imageAccept, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, sections: item.sections.map((part, partIndex) => partIndex === sectionIndex ? { ...part, image: url } : part) } : item) }))} />
+                <MediaField label="Photo" {...bindMedia(`${service.slug}-section-${sectionIndex}`, section.image ?? '', imageAccept, DEFAULT_CONTENT.services.find((item) => item.slug === service.slug)?.sections[sectionIndex]?.image ?? '', (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, sections: item.sections.map((part, partIndex) => partIndex === sectionIndex ? { ...part, image: url } : part) } : item) }))} />
                 <Field label="Button label" value={section.buttonLabel ?? ''} onChange={(buttonLabel) => updateSection(sectionIndex, { buttonLabel })} />
                 <Field label="Button link" value={section.buttonTo ?? ''} onChange={(buttonTo) => updateSection(sectionIndex, { buttonTo })} />
-                <button type="button" className="text-sm text-red-300" onClick={() => updateService({ sections: service.sections.filter((_, index) => index !== sectionIndex) })}>
+                <button type="button" className="text-left text-sm text-red-300" onClick={() => removeServiceSection(sectionIndex)}>
                   Remove section
                 </button>
               </Section>
+            ))}
+            {removedForService.map((item) => (
+              <div key={item.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#141413] px-4 py-3">
+                <p className="text-sm text-white/80">Removed section: {item.section.heading}</p>
+                <button type="button" className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-brand-primary" onClick={() => restoreStashedSection(item.id)}>
+                  Reset
+                </button>
+              </div>
+            ))}
+            {missingSections.map((section) => (
+              <div key={section.heading} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#141413] px-4 py-3">
+                <p className="text-sm text-white/80">Removed section: {section.heading}</p>
+                <button type="button" className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-brand-primary" onClick={() => restoreDefaultSection(section.heading)}>
+                  Reset
+                </button>
+              </div>
             ))}
             <button
               type="button"
@@ -305,8 +453,8 @@ function Dashboard() {
             <Field label="Heading" value={content.fleet.heading} onChange={(heading) => setContent({ ...content, fleet: { ...content.fleet, heading } })} />
             <Field label="Gold words" value={content.fleet.highlight} onChange={(highlight) => setContent({ ...content, fleet: { ...content.fleet, highlight } })} />
             <Area label="Subtext" value={content.fleet.subtext} onChange={(subtext) => setContent({ ...content, fleet: { ...content.fleet, subtext } })} />
-            <MediaField label="Hero photo" {...bindMedia('fleet-image', content.fleet.image, imageAccept, (current, url) => ({ ...current, fleet: { ...current.fleet, image: url } }))} />
-            <MediaField label="Hero video" {...bindMedia('fleet-video', content.fleet.video, mediaAccept, (current, url) => ({ ...current, fleet: { ...current.fleet, video: url } }))} />
+            <MediaField label="Hero photo" {...bindMedia('fleet-image', content.fleet.image, imageAccept, DEFAULT_CONTENT.fleet.image, (current, url) => ({ ...current, fleet: { ...current.fleet, image: url } }))} />
+            <MediaField label="Hero video" {...bindMedia('fleet-video', content.fleet.video, mediaAccept, DEFAULT_CONTENT.fleet.video, (current, url) => ({ ...current, fleet: { ...current.fleet, video: url } }))} />
             <Field label="Intro heading" value={content.fleet.introHeading} onChange={(introHeading) => setContent({ ...content, fleet: { ...content.fleet, introHeading } })} />
             <Area label="Intro text" value={content.fleet.introText} onChange={(introText) => setContent({ ...content, fleet: { ...content.fleet, introText } })} />
             <Field label="Closing heading" value={content.fleet.closingHeading} onChange={(closingHeading) => setContent({ ...content, fleet: { ...content.fleet, closingHeading } })} />
@@ -324,7 +472,7 @@ function Dashboard() {
                 <Field label="Short name" value={vehicle.shortName} onChange={(shortName) => setContent({ ...content, vehicles: content.vehicles.map((item, itemIndex) => itemIndex === index ? { ...item, shortName } : item) })} />
                 <Field label="Seats" value={vehicle.seats} onChange={(seats) => setContent({ ...content, vehicles: content.vehicles.map((item, itemIndex) => itemIndex === index ? { ...item, seats } : item) })} />
                 <Field label="Price per hour" value={String(vehicle.hourly)} onChange={(hourly) => setContent({ ...content, vehicles: content.vehicles.map((item, itemIndex) => itemIndex === index ? { ...item, hourly: Number(hourly) || 0 } : item) })} />
-                <MediaField label="Photo" {...bindMedia(vehicle.id, vehicle.image, imageAccept, (current, url) => ({ ...current, vehicles: current.vehicles.map((item) => item.id === vehicle.id ? { ...item, image: url } : item) }))} />
+                <MediaField label="Photo" {...bindMedia(vehicle.id, vehicle.image, imageAccept, DEFAULT_CONTENT.vehicles.find((item) => item.id === vehicle.id)?.image ?? '', (current, url) => ({ ...current, vehicles: current.vehicles.map((item) => item.id === vehicle.id ? { ...item, image: url } : item) }))} />
               </div>
             ))}
             {content.airports.map((airport, airportIndex) => (
@@ -356,7 +504,7 @@ function Dashboard() {
               <Area label="Subtext" value={content.faqsPage.subtext} onChange={(subtext) => setContent({ ...content, faqsPage: { ...content.faqsPage, subtext } })} />
               <Field label="Section heading" value={content.faqsPage.sectionHeading} onChange={(sectionHeading) => setContent({ ...content, faqsPage: { ...content.faqsPage, sectionHeading } })} />
               <Area label="Section text" value={content.faqsPage.sectionText} onChange={(sectionText) => setContent({ ...content, faqsPage: { ...content.faqsPage, sectionText } })} />
-              <MediaField label="Photo" {...bindMedia('faq-image', content.faqsPage.image, imageAccept, (current, url) => ({ ...current, faqsPage: { ...current.faqsPage, image: url } }))} />
+              <MediaField label="Photo" {...bindMedia('faq-image', content.faqsPage.image, imageAccept, DEFAULT_CONTENT.faqsPage.image, (current, url) => ({ ...current, faqsPage: { ...current.faqsPage, image: url } }))} />
               <Field label="Closing heading" value={content.faqsPage.closingHeading} onChange={(closingHeading) => setContent({ ...content, faqsPage: { ...content.faqsPage, closingHeading } })} />
               <Area label="Closing text" value={content.faqsPage.closingText} onChange={(closingText) => setContent({ ...content, faqsPage: { ...content.faqsPage, closingText } })} />
             </Section>
@@ -394,14 +542,14 @@ function Dashboard() {
             <Field label="Eyebrow" value={content.contact.eyebrow} onChange={(eyebrow) => setContent({ ...content, contact: { ...content.contact, eyebrow } })} />
             <Field label="Heading" value={content.contact.heading} onChange={(heading) => setContent({ ...content, contact: { ...content.contact, heading } })} />
             <Area label="Lead" value={content.contact.lead} onChange={(lead) => setContent({ ...content, contact: { ...content.contact, lead } })} />
-            <MediaField label="Top photo" {...bindMedia('contact-hero', content.contact.heroImage, imageAccept, (current, url) => ({ ...current, contact: { ...current.contact, heroImage: url } }))} />
+            <MediaField label="Top photo" {...bindMedia('contact-hero', content.contact.heroImage, imageAccept, DEFAULT_CONTENT.contact.heroImage, (current, url) => ({ ...current, contact: { ...current.contact, heroImage: url } }))} />
             <Field label="Card eyebrow" value={content.contact.cardEyebrow} onChange={(cardEyebrow) => setContent({ ...content, contact: { ...content.contact, cardEyebrow } })} />
             <Field label="Card heading" value={content.contact.cardHeading} onChange={(cardHeading) => setContent({ ...content, contact: { ...content.contact, cardHeading } })} />
             <Area label="Card text" value={content.contact.cardText} onChange={(cardText) => setContent({ ...content, contact: { ...content.contact, cardText } })} />
             <Field label="Brief eyebrow" value={content.contact.briefEyebrow} onChange={(briefEyebrow) => setContent({ ...content, contact: { ...content.contact, briefEyebrow } })} />
             <Field label="Brief heading" value={content.contact.briefHeading} onChange={(briefHeading) => setContent({ ...content, contact: { ...content.contact, briefHeading } })} />
             <Area label="Brief text" value={content.contact.briefText} onChange={(briefText) => setContent({ ...content, contact: { ...content.contact, briefText } })} />
-            <MediaField label="Brief photo" {...bindMedia('contact-brief', content.contact.briefImage, imageAccept, (current, url) => ({ ...current, contact: { ...current.contact, briefImage: url } }))} />
+            <MediaField label="Brief photo" {...bindMedia('contact-brief', content.contact.briefImage, imageAccept, DEFAULT_CONTENT.contact.briefImage, (current, url) => ({ ...current, contact: { ...current.contact, briefImage: url } }))} />
             {content.contact.steps.map((step, index) => (
               <div key={step.number + index} className="grid gap-2 rounded-xl border border-white/10 p-3">
                 <Field label="Step number" value={step.number} onChange={(number) => setContent({ ...content, contact: { ...content.contact, steps: content.contact.steps.map((item, itemIndex) => itemIndex === index ? { ...item, number } : item) } })} />
@@ -414,7 +562,7 @@ function Dashboard() {
 
         {tab === 'Book' && (
           <Section title="Booking page">
-            <MediaField label="Background photo" {...bindMedia('book', content.book.backgroundImage, imageAccept, (current, url) => ({ ...current, book: { backgroundImage: url } }))} />
+            <MediaField label="Background photo" {...bindMedia('book', content.book.backgroundImage, imageAccept, DEFAULT_CONTENT.book.backgroundImage, (current, url) => ({ ...current, book: { backgroundImage: url } }))} />
             <p className="text-sm text-white/60">Fares on the booking form use the Prices tab.</p>
           </Section>
         )}

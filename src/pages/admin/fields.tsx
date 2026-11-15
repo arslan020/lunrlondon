@@ -34,6 +34,7 @@ export function MediaField({
   onUpload,
   onChange,
   onRemove,
+  onReset,
 }: {
   label: string
   value: string
@@ -42,6 +43,7 @@ export function MediaField({
   onUpload: (file: File) => void
   onChange: (value: string) => void
   onRemove?: () => void
+  onReset?: () => void
 }) {
   const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(value) || value.startsWith('data:video')
   return (
@@ -72,6 +74,11 @@ export function MediaField({
         {value && onRemove && (
           <button type="button" className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-red-300 disabled:opacity-60" disabled={uploading} onClick={onRemove}>
             Remove
+          </button>
+        )}
+        {!value && onReset && (
+          <button type="button" className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-brand-primary disabled:opacity-60" disabled={uploading} onClick={onReset}>
+            Reset
           </button>
         )}
       </div>
