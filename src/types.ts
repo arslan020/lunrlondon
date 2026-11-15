@@ -19,6 +19,7 @@ export interface ServiceData {
   heroHighlight?: string
   heroSubtext: string
   heroImage?: string
+  heroVideo?: string
   cardImage?: string
   imagePosition?: string
   sections: ServiceFeatureSection[]

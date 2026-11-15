@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import AddressField from '../components/AddressField'
+import { useContent } from '../content/ContentProvider'
 import {
-  airports,
   formatPrice,
   journeyPrice,
-  minimumHours,
-  vehicles,
   type TripType,
   type VehicleId,
 } from '../data/pricing'
@@ -23,6 +21,8 @@ const fieldClass =
   'w-full min-w-0 max-w-full border-0 border-b border-white/30 bg-transparent px-0 py-3 text-base text-white outline-none placeholder:text-white/40 focus:border-brand-primary [color-scheme:dark]'
 
 function Book() {
+  const { vehicles, airports, minimumHours, book } = useContent()
+  const catalog = { vehicles, airports, minimumHours }
   const [step, setStep] = useState<1 | 2>(1)
   const [tripType, setTripType] = useState<TripType>('one-way')
   const [pickup, setPickup] = useState('')
@@ -52,8 +52,8 @@ function Book() {
   const quoteOptions = { tripType, hours, airportId, pickup, dropoff, returning, chargedHours }
 
   const selectedQuote = useMemo(
-    () => journeyPrice({ ...quoteOptions, vehicleId }),
-    [tripType, hours, airportId, pickup, dropoff, returning, vehicleId, chargedHours],
+    () => journeyPrice({ ...quoteOptions, vehicleId }, catalog),
+    [tripType, hours, airportId, pickup, dropoff, returning, vehicleId, chargedHours, vehicles, airports, minimumHours],
   )
 
   useEffect(() => {
@@ -172,7 +172,7 @@ function Book() {
   return (
     <section className="relative pb-16 pl-4 pr-16 pt-28 sm:pl-6 sm:pr-20 md:pt-32">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <img src="/images/fleet-night.jpg" alt="" className="h-full w-full object-cover object-center" />
+        <img src={book.backgroundImage} alt="" className="h-full w-full object-cover object-center" />
         <div className="absolute inset-0 bg-black/25" />
       </div>
       <div className="relative mx-auto grid w-full min-w-0 max-w-content items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
@@ -338,7 +338,7 @@ function Book() {
                       )}
                       <ul className="mt-3 divide-y divide-white/10">
                         {vehicles.map((vehicle) => {
-                          const quote = journeyPrice({ ...quoteOptions, vehicleId: vehicle.id })
+                          const quote = journeyPrice({ ...quoteOptions, vehicleId: vehicle.id }, catalog)
                           return (
                             <li key={vehicle.id} className="flex items-center justify-between gap-3 py-2 text-sm">
                               <span>{vehicle.name}</span>
@@ -364,7 +364,7 @@ function Book() {
                 <form onSubmit={submit} className="space-y-4">
                   <div className="grid gap-3">
                     {vehicles.map((vehicle) => {
-                      const quote = journeyPrice({ ...quoteOptions, vehicleId: vehicle.id })
+                      const quote = journeyPrice({ ...quoteOptions, vehicleId: vehicle.id }, catalog)
                       const selected = vehicleId === vehicle.id
                       return (
                         <button

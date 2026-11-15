@@ -6,7 +6,7 @@ import CTASection from '../components/CTASection'
 import GoldCtaBar from '../components/GoldCtaBar'
 import Button from '../components/Button'
 import UKMapGraphic from '../components/UKMapGraphic'
-import { getServiceBySlug } from '../data/services'
+import { useContent } from '../content/ContentProvider'
 import type { ServiceFeatureSection } from '../types'
 
 function headingWithHighlight(heading: string, highlight?: string) {
@@ -62,7 +62,8 @@ function GoldPanel({ section }: { section: ServiceFeatureSection }) {
 
 function ServiceDetail() {
   const { slug } = useParams<{ slug: string }>()
-  const service = slug ? getServiceBySlug(slug) : undefined
+  const { services } = useContent()
+  const service = slug ? services.find((item) => item.slug === slug) : undefined
 
   if (!service) {
     return <Navigate to="/chauffeur-services" replace />
@@ -76,6 +77,7 @@ function ServiceDetail() {
         highlight={service.heroHighlight}
         subtext={service.heroSubtext}
         image={service.heroImage}
+        video={service.heroVideo || undefined}
         imagePosition={service.imagePosition}
       />
 

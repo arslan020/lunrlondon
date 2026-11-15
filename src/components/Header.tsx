@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { siteConfig } from '../siteConfig'
-import { services } from '../data/services'
+import { useContent } from '../content/ContentProvider'
 
 function Header() {
+  const { site: siteConfig, services } = useContent()
   const [servicesOpen, setServicesOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)

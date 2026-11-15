@@ -1,6 +1,7 @@
-import { siteConfig } from '../siteConfig'
+import { useContent } from '../content/ContentProvider'
 
 function WhatsAppTag() {
+  const { site: siteConfig } = useContent()
   const number = siteConfig.whatsapp.replace(/[^\d]/g, '')
   if (!number) return null
 

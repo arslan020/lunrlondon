@@ -1,8 +1,9 @@
 import { useRef } from 'react'
 import ServiceCard from './ServiceCard'
-import { services } from '../data/services'
+import { useContent } from '../content/ContentProvider'
 
 function ServicesCarousel() {
+  const { services } = useContent()
   const trackRef = useRef<HTMLDivElement>(null)
 
   const scroll = (direction: 'left' | 'right') => {

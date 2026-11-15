@@ -64,17 +64,23 @@ export const minimumHours = 2
 
 export const formatPrice = (amount: number) => `£${amount}`
 
-export function airportById(id: string) {
-  return airports.find((airport) => airport.id === id)
+export type PriceCatalog = {
+  vehicles?: Vehicle[]
+  airports?: AirportFare[]
+  minimumHours?: number
 }
 
-export function vehicleById(id: VehicleId) {
-  return vehicles.find((vehicle) => vehicle.id === id)
+export function airportById(id: string, list: AirportFare[] = airports) {
+  return list.find((airport) => airport.id === id)
 }
 
-export function matchAirport(text: string) {
+export function vehicleById(id: VehicleId, list: Vehicle[] = vehicles) {
+  return list.find((vehicle) => vehicle.id === id)
+}
+
+export function matchAirport(text: string, list: AirportFare[] = airports) {
   const value = text.toLowerCase()
-  return airports.find(
+  return list.find(
     (airport) => value.includes(airport.name.toLowerCase()) || value.includes(airport.id),
   )
 }
@@ -88,12 +94,15 @@ export function journeyPrice(options: {
   dropoff: string
   returning: boolean
   chargedHours?: number
-}) {
-  const vehicle = vehicleById(options.vehicleId)
+}, catalog: PriceCatalog = {}) {
+  const vehicleList = catalog.vehicles ?? vehicles
+  const airportList = catalog.airports ?? airports
+  const minimum = catalog.minimumHours && catalog.minimumHours > 0 ? catalog.minimumHours : minimumHours
+  const vehicle = vehicleById(options.vehicleId, vehicleList)
   if (!vehicle) return null
 
   if (options.tripType === 'hourly') {
-    const hours = Math.max(options.hours || minimumHours, minimumHours)
+    const hours = Math.max(options.hours || minimum, minimum)
     const amount = vehicle.hourly * hours * (options.returning ? 2 : 1)
     return {
       amount,
@@ -103,8 +112,8 @@ export function journeyPrice(options: {
 
   const airport =
     options.tripType === 'airport'
-      ? airportById(options.airportId)
-      : matchAirport(`${options.pickup} ${options.dropoff}`)
+      ? airportById(options.airportId, airportList)
+      : matchAirport(`${options.pickup} ${options.dropoff}`, airportList)
 
   if (airport) {
     const fare = airport.prices[options.vehicleId]
@@ -123,8 +132,8 @@ export function journeyPrice(options: {
 
   const hours =
     options.chargedHours && options.chargedHours > 0
-      ? Math.max(options.chargedHours, minimumHours)
-      : minimumHours
+      ? Math.max(options.chargedHours, minimum)
+      : minimum
   const amount = vehicle.hourly * hours * (options.returning ? 2 : 1)
   return {
     amount,

@@ -1,10 +1,8 @@
 import { Link } from 'react-router-dom'
-import { siteConfig } from '../siteConfig'
-import { services } from '../data/services'
-
-const areas = ['London', 'Heathrow', 'Gatwick', 'Luton', 'Stansted', 'London City', 'Farnborough']
+import { useContent } from '../content/ContentProvider'
 
 function Footer() {
+  const { site: siteConfig, services, areas } = useContent()
   return (
     <footer className="bg-black text-white">
       <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6">
@@ -19,11 +17,7 @@ function Footer() {
               </span>
             )}
           </Link>
-          <p className="mt-4 text-sm leading-relaxed text-neutral-300">
-            From sunrise to moonlight. Luxury never sleeps. {siteConfig.brandName} is available 24 hours a day,
-            7 days a week, for airport arrivals, one-way journeys, and hourly hire, with a licensed chauffeur
-            and the fare confirmed before you travel. We accept cryptocurrency.
-          </p>
+            <p className="mt-4 text-sm leading-relaxed text-neutral-300">{siteConfig.footerText}</p>
         </div>
 
         <div className="lg:pl-8">

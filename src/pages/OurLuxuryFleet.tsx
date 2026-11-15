@@ -3,7 +3,8 @@ import PageHero from '../components/PageHero'
 import SectionHeading from '../components/SectionHeading'
 import CTASection from '../components/CTASection'
 import Button from '../components/Button'
-import { formatPrice, vehicles, type VehicleId } from '../data/pricing'
+import { formatPrice, type VehicleId } from '../data/pricing'
+import { useContent } from '../content/ContentProvider'
 
 const cardImagePosition: Record<VehicleId, string> = {
   'e-class': 'object-center',
@@ -13,26 +14,25 @@ const cardImagePosition: Record<VehicleId, string> = {
 }
 
 function OurLuxuryFleet() {
+  const { fleet, vehicles } = useContent()
   return (
     <>
       <PageHero
-        heading="Our Luxury Fleet"
-        highlight="Luxury"
-        subtext="Our vehicles are chosen for comfort, refinement, and reliability. Every journey is presented in a meticulously prepared car, driven by a licensed chauffeur."
+        heading={fleet.heading}
+        highlight={fleet.highlight}
+        subtext={fleet.subtext}
         buttonLabel="Choose Your Vehicle"
         buttonTo="/book"
-        image="/images/fleet-night.jpg"
-        imageFit="natural"
+        image={fleet.image}
+        video={fleet.video || undefined}
+        imageFit={fleet.video ? 'cover' : 'natural'}
         scrim="soft"
       />
 
       <section className="py-12 md:py-20">
         <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">
-          <SectionHeading heading="Select the Right Vehicle for Your Journey" align="center" />
-          <p className="mt-6 leading-relaxed text-neutral-200">
-            Choose an E-Class, V-Class, S-Class, or Range Rover. Hourly hire is priced per hour, and airport
-            journeys use the fixed fares on the booking page.
-          </p>
+          <SectionHeading heading={fleet.introHeading} align="center" />
+          <p className="mt-6 leading-relaxed text-neutral-200">{fleet.introText}</p>
           <div className="mt-8">
             <Button to="/contact" variant="outline">
               Contact Us For A Recommendation
@@ -74,8 +74,8 @@ function OurLuxuryFleet() {
       </section>
 
       <CTASection
-        heading="Need Help Choosing a Vehicle?"
-        text="Tell us about your journey and we will recommend the right vehicle or provide a quote."
+        heading={fleet.closingHeading}
+        text={fleet.closingText}
         buttonLabel="Contact Us"
         buttonTo="/contact"
       />

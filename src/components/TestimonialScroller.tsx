@@ -1,7 +1,8 @@
-import { testimonials } from '../data/testimonials'
+import type { Testimonial } from '../types'
+import { useContent } from '../content/ContentProvider'
 import TestimonialCard from './TestimonialCard'
 
-function Column({ items, duration }: { items: typeof testimonials; duration: string }) {
+function Column({ items, duration }: { items: Testimonial[]; duration: string }) {
   const loop = [...items, ...items]
   return (
     <div className="max-h-[560px] overflow-hidden md:max-h-[680px]">
@@ -15,6 +16,8 @@ function Column({ items, duration }: { items: typeof testimonials; duration: str
 }
 
 function TestimonialScroller() {
+  const { testimonials } = useContent()
+  if (testimonials.length === 0) return null
   const left = testimonials.filter((_, index) => index % 2 === 0)
   const right = testimonials.filter((_, index) => index % 2 === 1)
 

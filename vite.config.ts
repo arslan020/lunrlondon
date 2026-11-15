@@ -56,6 +56,70 @@ function enquiryDevApi(): Plugin {
   }
 }
 
+function cmsDevApi(): Plugin {
+  const routes: Record<string, string> = {
+    '/api/content': '/api/content.ts',
+    '/api/admin/login': '/api/admin/login.ts',
+    '/api/admin/logout': '/api/admin/logout.ts',
+    '/api/admin/content': '/api/admin/content.ts',
+    '/api/admin/upload': '/api/admin/upload.ts',
+    '/api/admin/blob': '/api/admin/blob.ts',
+  }
+
+  return {
+    name: 'cms-dev-api',
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        const pathname = req.url?.split('?')[0]
+        const file = pathname ? routes[pathname] : undefined
+        if (!file) {
+          next()
+          return
+        }
+
+        try {
+          const chunks: Buffer[] = []
+          for await (const chunk of req) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+          const raw = Buffer.concat(chunks)
+          if (raw.byteLength > 80 * 1024 * 1024) {
+            res.statusCode = 413
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: 'That file is too large.' }))
+            return
+          }
+
+          const headers = new Headers()
+          if (req.headers.cookie) headers.set('cookie', req.headers.cookie)
+          if (req.headers['content-type']) headers.set('content-type', String(req.headers['content-type']))
+          const request = new Request(`http://localhost${pathname}`, {
+            method: req.method,
+            headers,
+            body: req.method === 'GET' || req.method === 'HEAD' || raw.byteLength === 0 ? undefined : raw,
+          })
+          const loaded = (await server.ssrLoadModule(file)) as {
+            GET?: (request: Request) => Promise<Response>
+            POST?: (request: Request) => Promise<Response>
+          }
+          const method = req.method === 'GET' ? loaded.GET : req.method === 'POST' ? loaded.POST : undefined
+          const response = method ? await method(request) : new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 })
+          res.statusCode = response.status
+          const cookies = response.headers.getSetCookie?.() ?? []
+          if (cookies.length) res.setHeader('Set-Cookie', cookies)
+          response.headers.forEach((value, key) => {
+            if (key !== 'set-cookie') res.setHeader(key, value)
+          })
+          res.end(Buffer.from(await response.arrayBuffer()))
+        } catch (error) {
+          console.error(error)
+          res.statusCode = 500
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ error: 'The dashboard could not complete that request.' }))
+        }
+      })
+    },
+  }
+}
+
 function quoteDevApi(): Plugin {
   return {
     name: 'quote-dev-api',
@@ -101,11 +165,23 @@ function quoteDevApi(): Plugin {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  if (env.RESEND_API_KEY) process.env.RESEND_API_KEY = env.RESEND_API_KEY
-  if (env.GOOGLE_MAPS_API_KEY) process.env.GOOGLE_MAPS_API_KEY = env.GOOGLE_MAPS_API_KEY
+  const keys = [
+    'RESEND_API_KEY',
+    'GOOGLE_MAPS_API_KEY',
+    'DATABASE_URL',
+    'POSTGRES_URL',
+    'POSTGRES_PRISMA_URL',
+    'POSTGRES_URL_NON_POOLING',
+    'DATABASE_URL_UNPOOLED',
+    'NEON_DATABASE_URL',
+    'BLOB_READ_WRITE_TOKEN',
+  ]
+  for (const key of keys) {
+    if (env[key]) process.env[key] = env[key]
+  }
 
   return {
-    plugins: [react(), enquiryDevApi(), quoteDevApi()],
+    plugins: [react(), enquiryDevApi(), quoteDevApi(), cmsDevApi()],
   }
 })
 

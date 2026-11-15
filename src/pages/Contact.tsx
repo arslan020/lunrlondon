@@ -1,8 +1,7 @@
 import { useMemo, useRef, useState, type FormEvent, type PointerEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { faqGroups } from '../data/faqs'
+import { useContent } from '../content/ContentProvider'
 import { sendEnquiry } from '../lib/sendEnquiry'
-import { siteConfig } from '../siteConfig'
 
 const fieldClass =
   'mt-1.5 w-full rounded-lg border border-white/10 bg-black/40 px-4 py-3 text-base text-white outline-none placeholder:text-neutral-500 transition-[border-color,background-color,box-shadow] duration-200 hover:border-white/35 hover:bg-white/10 focus:border-white/45 focus:bg-white/10 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.08)]'
@@ -12,6 +11,7 @@ function digits(value: string) {
 }
 
 function Contact() {
+  const { site: siteConfig, contact, faqs: faqGroups } = useContent()
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
@@ -56,7 +56,7 @@ function Contact() {
             .map((faq) => ({ ...faq, groupTitle: item.groupTitle }))
         : [],
     )
-  }, [group, query])
+  }, [group, query, faqGroups])
 
   const visible = showAll ? questions : questions.slice(0, 4)
 
@@ -91,12 +91,12 @@ function Contact() {
     <div className="bg-black text-white">
       <section className="px-4 pb-4 pt-28 sm:px-6">
         <div className="mx-auto max-w-content text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-400">Get in touch</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-400">{contact.eyebrow}</p>
           <h1 className="mx-auto mt-4 max-w-[14ch] text-[2.35rem] font-medium leading-[1.08] tracking-tight text-white sm:text-6xl">
-            Someone here when the journey needs a person.
+            {contact.heading}
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-[15px] leading-relaxed text-neutral-300 sm:text-base">
-            Speak with {siteConfig.brandName} about a new journey, a change to a booking, or a plan that needs more than a form.
+            {contact.lead}
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
@@ -116,7 +116,7 @@ function Contact() {
             </button>
           </div>
           <img
-            src="/images/chauffeur.jpg"
+            src={contact.heroImage}
             alt=""
             className="mt-10 h-56 w-full rounded-2xl object-cover object-[center_30%] sm:h-[420px]"
           />
@@ -142,13 +142,11 @@ function Contact() {
           >
             <div className="relative z-[1] grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400">Get in touch</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-400">{contact.cardEyebrow}</p>
                 <h2 className="mt-3 text-[1.85rem] font-semibold uppercase leading-[1.02] tracking-tight sm:text-[2.6rem]">
-                  Talk to a person, any hour.
+                  {contact.cardHeading}
                 </h2>
-                <p className="mt-4 max-w-md text-sm leading-relaxed text-neutral-300">
-                  See a fare online, and reach the team when you want to talk the journey through. We accept cryptocurrency.
-                </p>
+                <p className="mt-4 max-w-md text-sm leading-relaxed text-neutral-300">{contact.cardText}</p>
                 <Link to="/book" className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-white">
                   Book now / Get quote
                   <span aria-hidden="true">›</span>
@@ -237,16 +235,14 @@ function Contact() {
       <section className="px-4 py-12 sm:px-6">
         <div className="mx-auto grid max-w-content items-start gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)] lg:gap-16">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-400">Plan the enquiry</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-400">{contact.briefEyebrow}</p>
             <h2 className="mt-3 max-w-[12ch] text-[2rem] font-medium leading-[1.08] tracking-tight sm:text-5xl">
-              A clear brief. A calmer arrival.
+              {contact.briefHeading}
             </h2>
-            <img src="/images/contact-brief.jpg" alt="" className="mt-6 h-56 w-full rounded-2xl object-cover object-center sm:h-72" />
-            <p className="mt-5 max-w-xl text-sm leading-relaxed text-neutral-300">
-              A few details help us recommend the right vehicle and confirm the journey clearly.
-            </p>
+            <img src={contact.briefImage} alt="" className="mt-6 h-56 w-full rounded-2xl object-cover object-center sm:h-72" />
+            <p className="mt-5 max-w-xl text-sm leading-relaxed text-neutral-300">{contact.briefText}</p>
             <ol className="mt-4">
-              {steps.map((step) => (
+              {contact.steps.map((step) => (
                 <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-3 border-t border-white/10 py-5">
                   <span className="pt-0.5 text-sm text-neutral-500">{step.number}</span>
                   <div>
@@ -354,24 +350,6 @@ function Contact() {
     </div>
   )
 }
-
-const steps = [
-  {
-    number: '01',
-    title: 'Where and when',
-    text: 'Collection address, destination, travel date and pickup time. For an airport journey, add the flight number so we can confirm the terminal and follow any change.',
-  },
-  {
-    number: '02',
-    title: 'Passengers and luggage',
-    text: 'Tell us how many people are travelling and how much luggage you expect, so we can recommend the most comfortable vehicle.',
-  },
-  {
-    number: '03',
-    title: 'Anything extra',
-    text: 'Include child seats, extra stops, access needs, or a return. We confirm availability and the fare before you travel.',
-  },
-]
 
 function Arrow() {
   return (

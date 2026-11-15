@@ -1,22 +1,37 @@
 import ImagePlaceholder from '../components/ImagePlaceholder'
-import SectionHeading from '../components/SectionHeading'
 import ServicesCarousel from '../components/ServicesCarousel'
 import TestimonialScroller from '../components/TestimonialScroller'
 import PageHero from '../components/PageHero'
 import GoldCtaBar from '../components/GoldCtaBar'
 import CTASection from '../components/CTASection'
 import Button from '../components/Button'
-import { siteConfig } from '../siteConfig'
+import SectionHeading from '../components/SectionHeading'
+import { useContent } from '../content/ContentProvider'
+
+function goldHeading(heading: string, highlight: string) {
+  if (!highlight || !heading.includes(highlight)) return heading
+  const [before, after] = heading.split(highlight)
+  return (
+    <>
+      {before}
+      <em className="italic text-brand-primary">{highlight}</em>
+      {after}
+    </>
+  )
+}
 
 function Home() {
+  const { home, site } = useContent()
+  const paragraphs = home.luxuryParagraphs.filter((paragraph) => paragraph.trim())
+
   return (
     <div className="bg-black">
       <PageHero
-        heading="A Higher Standard of Chauffeuring. Around the Clock."
-        highlight="Around the Clock"
-        subtext="From sunrise to moonlight, experience chauffeur services where excellence has no closing hours."
-        video="/videos/hero.mp4"
-        image="/images/hero.jpg"
+        heading={home.heroHeading}
+        highlight={home.heroHighlight}
+        subtext={home.heroSubtext}
+        video={home.heroVideo || undefined}
+        image={home.heroImage}
         videoClassName="brightness-[1.18]"
         scrim="soft"
       />
@@ -30,27 +45,15 @@ function Home() {
       <section className="py-12 md:py-20">
         <div className="mx-auto grid max-w-content items-start gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16">
           <h2 className="font-serif text-[clamp(2rem,1.4rem+2.2vw,3rem)] font-medium leading-tight text-white">
-            Luxury Never <em className="italic text-brand-primary">Sleeps</em>
+            {goldHeading(home.luxuryHeading, home.luxuryHighlight)}
           </h2>
           <div>
-            <p className="leading-relaxed text-neutral-200">
-              At {siteConfig.brandName}, we believe true luxury is not simply about where you travel, but
-              how you are treated along the way.
-            </p>
-            <p className="mt-5 leading-relaxed text-neutral-200">
-              Every journey is an opportunity to demonstrate our commitment to trust, reliability, respect
-              and honour. From the moment you make your booking to the moment you reach your destination,
-              we place your comfort, time and confidence at the heart of everything we do.
-            </p>
-            <p className="mt-5 leading-relaxed text-neutral-200">
-              Whether travelling for business, leisure or a special occasion, our approach remains
-              unchanged: professional service, considered attention and an unwavering commitment to the
-              highest standards.
-            </p>
-            <p className="mt-5 leading-relaxed text-neutral-200">
-              Available 24 hours a day, 7 days a week, we move with the rhythm of your world.
-            </p>
-            <p className="mt-5 font-serif text-xl text-brand-primary">{siteConfig.brandName}. Luxury Never Sleeps.</p>
+            {paragraphs.map((paragraph) => (
+              <p key={paragraph} className="mt-5 leading-relaxed text-neutral-200 first:mt-0">
+                {paragraph}
+              </p>
+            ))}
+            <p className="mt-5 font-serif text-xl text-brand-primary">{home.luxurySignoff}</p>
             <div className="mt-8">
               <Button to="/contact">Enquire Today</Button>
             </div>
@@ -59,60 +62,40 @@ function Home() {
       </section>
 
       <div className="py-4 md:py-6">
-        <GoldCtaBar text="From sunrise to moonlight. We know luxury never sleeps." />
+        <GoldCtaBar text={home.goldBar} />
       </div>
 
       <section className="py-12 md:py-20">
         <div className="mx-auto grid max-w-content items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
           <div>
-            <SectionHeading heading="Trust Is Our Foundation" highlight="Trust" theme="dark" />
-            <p className="mt-6 leading-relaxed text-neutral-200">
-              Confidence is earned, never assumed. Whether you're travelling for business or pleasure, we
-              treat every booking as a responsibility, and every journey with integrity, honesty and
-              accountability.
-            </p>
-            <p className="mt-4 leading-relaxed text-neutral-200">
-              From private and commercial airport transfers to executive chauffeur travel and close
-              protection, our service is built around three things: your time, your privacy and your peace
-              of mind.
-            </p>
-            <h3 className="mt-6 font-serif text-2xl italic text-brand-primary">Your time matters.</h3>
-            <p className="mt-3 leading-relaxed text-neutral-200">
-              Punctuality, preparation and consistency sit at the centre of everything we do. Flights are
-              monitored, routes are planned in advance, and your chauffeur is ready when you are.
-            </p>
-            <h3 className="mt-6 font-serif text-2xl italic text-brand-primary">Discretion is guaranteed.</h3>
-            <p className="mt-3 leading-relaxed text-neutral-200">
-              Our chauffeurs and security professionals are trained to be professional, unobtrusive and
-              respectful of your confidentiality, at all times and in every setting.
-            </p>
+            <SectionHeading heading={home.trustHeading} highlight={home.trustHighlight} theme="dark" />
+            {home.trustParagraphs.filter((paragraph) => paragraph.trim()).map((paragraph) => (
+              <p key={paragraph} className="mt-6 leading-relaxed text-neutral-200 first:mt-6">
+                {paragraph}
+              </p>
+            ))}
+            <h3 className="mt-6 font-serif text-2xl italic text-brand-primary">{home.trustTimeHeading}</h3>
+            <p className="mt-3 leading-relaxed text-neutral-200">{home.trustTimeText}</p>
+            <h3 className="mt-6 font-serif text-2xl italic text-brand-primary">{home.trustDiscretionHeading}</h3>
+            <p className="mt-3 leading-relaxed text-neutral-200">{home.trustDiscretionText}</p>
             <div className="mt-8">
               <Button to="/book">Book With Confidence</Button>
             </div>
           </div>
-          <ImagePlaceholder label="Mercedes-Benz S-Class at the airport" src="/images/s-class-airport.jpg" className="min-h-[240px]" />
+          <ImagePlaceholder label={home.trustImageLabel} src={home.trustImage} className="min-h-[240px]" />
         </div>
       </section>
 
       <section className="py-8 md:py-16">
         <div className="mx-auto grid max-w-content items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
-          <ImagePlaceholder
-            label="Range Rover"
-            src="/images/rr-manor-side.jpg"
-            className="order-1 min-h-[240px] lg:order-1"
-          />
+          <ImagePlaceholder label="Range Rover" src={home.respectImage} className="order-1 min-h-[240px] lg:order-1" />
           <div className="order-2">
-            <SectionHeading heading="Respect Is Our Standard" highlight="Respect" theme="dark" />
-            <p className="mt-6 leading-relaxed text-neutral-200">
-              Every client, every occasion and every destination deserves consideration. We believe in
-              professionalism without exception, discretion without compromise and service without
-              assumption.
-            </p>
-            <p className="mt-4 leading-relaxed text-neutral-200">
-              Honour is our principle. We stand by our commitments. Our word carries meaning, our conduct
-              reflects our values, and our responsibility extends beyond simply getting you to your
-              destination.
-            </p>
+            <SectionHeading heading={home.respectHeading} highlight={home.respectHighlight} theme="dark" />
+            {home.respectParagraphs.filter((paragraph) => paragraph.trim()).map((paragraph) => (
+              <p key={paragraph} className="mt-6 leading-relaxed text-neutral-200">
+                {paragraph}
+              </p>
+            ))}
           </div>
         </div>
       </section>
@@ -121,13 +104,10 @@ function Home() {
         <div className="mx-auto grid max-w-content gap-10 px-4 sm:px-6 lg:grid-cols-3 lg:gap-12">
           <div>
             <h2 className="font-serif text-[clamp(2rem,1.4rem+2vw,2.8rem)] font-medium leading-tight text-white">
-              What Our <em className="italic text-brand-primary">Clients</em> Say
+              {goldHeading(home.reviewsHeading, home.reviewsHighlight)}
             </h2>
-            <p className="mt-5 leading-relaxed text-neutral-200">
-              From airport transfers to special occasions, our clients trust us for a smooth, professional
-              service every step of the way.
-            </p>
-            <Button href={siteConfig.googleReviewsUrl} className="mt-7">
+            <p className="mt-5 leading-relaxed text-neutral-200">{home.reviewsText}</p>
+            <Button href={site.googleReviewsUrl} className="mt-7">
               Check Out Our Google Reviews
             </Button>
           </div>
@@ -141,38 +121,24 @@ function Home() {
         <div className="mx-auto grid max-w-content items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
           <div>
             <h2 className="font-serif text-[clamp(2rem,1.4rem+2.2vw,3rem)] font-medium leading-tight text-white">
-              A Fleet <em className="italic text-brand-primary">Designed</em> for Comfort &amp; Flexibility
+              {goldHeading(home.fleetHeading, home.fleetHighlight)}
             </h2>
-            <p className="mt-6 leading-relaxed text-neutral-200">
-              The {siteConfig.brandName} fleet is the Mercedes-Benz E-Class, V-Class and S-Class, and the
-              Range Rover. All vehicles are:
-            </p>
+            <p className="mt-6 leading-relaxed text-neutral-200">{home.fleetText}</p>
             <ul className="mt-5 space-y-2 text-sm text-neutral-300">
-              {[
-                'Immaculately cleaned before every journey',
-                'Regularly maintained and safety checked',
-                'Driven by licensed professional chauffeurs',
-              ].map((item) => (
+              {home.fleetBullets.filter((item) => item.trim()).map((item) => (
                 <li key={item} className="relative pl-6">
                   <span className="absolute left-0 top-[0.45em] h-2 w-2 rounded-[2px] bg-brand-primary" />
                   {item}
                 </li>
               ))}
             </ul>
-            <p className="mt-5 leading-relaxed text-neutral-200">
-              Child and baby seats are available on request and must be arranged in advance.
-            </p>
+            <p className="mt-5 leading-relaxed text-neutral-200">{home.fleetNote}</p>
           </div>
-          <ImagePlaceholder label="Range Rover" src="/images/rr-manor-wide.jpg" className="min-h-[240px]" />
+          <ImagePlaceholder label="Range Rover" src={home.fleetImage} className="min-h-[240px]" />
         </div>
       </section>
 
-      <CTASection
-        heading="Whenever the World Calls, LUNR Is Ready."
-        text="From the earliest departure to the latest arrival, experience a service designed around your schedule, your expectations and your peace of mind. Day or night. Every journey. One standard."
-        buttonLabel="Contact Us"
-        buttonTo="/contact"
-      />
+      <CTASection heading={home.closingHeading} text={home.closingText} buttonLabel="Contact Us" buttonTo="/contact" />
     </div>
   )
 }

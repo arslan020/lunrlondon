@@ -1,7 +1,7 @@
-import { siteConfig } from '../siteConfig'
+import { useContent } from '../content/ContentProvider'
 
-// Gold monogram crest placeholder, standing in for the client's real logo mark.
 function LogoMark({ className = '' }: { className?: string }) {
+  const { site: siteConfig } = useContent()
   const initials = siteConfig.brandName
     .split(' ')
     .filter(Boolean)
