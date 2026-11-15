@@ -7,7 +7,11 @@ import type { VehicleId } from '../../data/pricing'
 import type { ServiceFeatureSection } from '../../types'
 import { Area, Field, Lines, MediaField, Section } from './fields'
 
-const TABS = ['Site', 'Home', 'Services', 'Fleet', 'Prices', 'FAQs', 'Reviews', 'Contact', 'Book', 'Privacy'] as const
+const PAGE_TABS = ['Site', 'Home', 'Services', 'Fleet', 'Prices', 'FAQs', 'Reviews', 'Contact', 'Book', 'Privacy'] as const
+
+function serviceTabId(slug: string) {
+  return `service:${slug}`
+}
 const mediaAccept = 'image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime'
 const imageAccept = 'image/jpeg,image/png,image/webp,image/gif'
 
@@ -18,14 +22,13 @@ function clean(lines: string[]) {
 function Dashboard() {
   const navigate = useNavigate()
   const [content, setContent] = useState<SiteContent | null>(null)
-  const [tab, setTab] = useState<(typeof TABS)[number]>('Site')
+  const [tab, setTab] = useState<string>('Site')
   const [storageConfigured, setStorageConfigured] = useState(true)
   const [blobReady, setBlobReady] = useState(false)
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState('')
-  const [serviceIndex, setServiceIndex] = useState(0)
 
   useEffect(() => {
     fetch('/api/admin/content', { credentials: 'include' })
@@ -108,12 +111,19 @@ function Dashboard() {
     return <main className="flex min-h-screen items-center justify-center bg-black text-white">{error || 'Loading…'}</main>
   }
 
-  const service = content.services[serviceIndex]
+  const service = content.services.find((item) => serviceTabId(item.slug) === tab)
+  const tabs = [
+    ...PAGE_TABS.slice(0, 3).map((id) => ({ id, label: id })),
+    ...content.services.map((item) => ({ id: serviceTabId(item.slug), label: item.navLabel })),
+    ...PAGE_TABS.slice(3).map((id) => ({ id, label: id })),
+  ]
   const updateService = (patch: Partial<SiteContent['services'][number]>) => {
-    const services = content.services.map((item, index) => (index === serviceIndex ? { ...item, ...patch } : item))
+    if (!service) return
+    const services = content.services.map((item) => (item.slug === service.slug ? { ...item, ...patch } : item))
     setContent({ ...content, services })
   }
   const updateSection = (sectionIndex: number, patch: Partial<ServiceFeatureSection>) => {
+    if (!service) return
     updateService({
       sections: service.sections.map((section, index) => (index === sectionIndex ? { ...section, ...patch } : section)),
     })
@@ -141,9 +151,9 @@ function Dashboard() {
           </div>
         </div>
         <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 pb-3">
-          {TABS.map((item) => (
-            <button key={item} type="button" onClick={() => setTab(item)} className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm ${tab === item ? 'bg-brand-primary text-brand-primary-contrast' : 'bg-white/10 text-white/80'}`}>
-              {item}
+          {tabs.map((item) => (
+            <button key={item.id} type="button" onClick={() => setTab(item.id)} className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm ${tab === item.id ? 'bg-brand-primary text-brand-primary-contrast' : 'bg-white/10 text-white/80'}`}>
+              {item.label}
             </button>
           ))}
         </div>
@@ -225,30 +235,27 @@ function Dashboard() {
           </>
         )}
 
-        {tab === 'Services' && service && (
+        {tab === 'Services' && (
+          <Section title="Services page">
+            <Field label="Heading" value={content.servicesPage.heading} onChange={(heading) => setContent({ ...content, servicesPage: { ...content.servicesPage, heading } })} />
+            <Field label="Gold words" value={content.servicesPage.highlight} onChange={(highlight) => setContent({ ...content, servicesPage: { ...content.servicesPage, highlight } })} />
+            <Area label="Subtext" value={content.servicesPage.subtext} onChange={(subtext) => setContent({ ...content, servicesPage: { ...content.servicesPage, subtext } })} />
+            <Lines label="Intro paragraphs" value={content.servicesPage.paragraphs} onChange={(paragraphs) => setContent({ ...content, servicesPage: { ...content.servicesPage, paragraphs } })} />
+            <p className="text-sm text-white/60">Each service has its own tab. Open that tab to change its text, hero photo, and card photo.</p>
+          </Section>
+        )}
+
+        {service && (
           <>
-            <Section title="Services page">
-              <Field label="Heading" value={content.servicesPage.heading} onChange={(heading) => setContent({ ...content, servicesPage: { ...content.servicesPage, heading } })} />
-              <Field label="Gold words" value={content.servicesPage.highlight} onChange={(highlight) => setContent({ ...content, servicesPage: { ...content.servicesPage, highlight } })} />
-              <Area label="Subtext" value={content.servicesPage.subtext} onChange={(subtext) => setContent({ ...content, servicesPage: { ...content.servicesPage, subtext } })} />
-              <Lines label="Intro paragraphs" value={content.servicesPage.paragraphs} onChange={(paragraphs) => setContent({ ...content, servicesPage: { ...content.servicesPage, paragraphs } })} />
-            </Section>
             <Section title={service.navLabel}>
-              <label className="block text-sm text-white/80">
-                Service
-                <select className="mt-1 w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2" value={serviceIndex} onChange={(event) => setServiceIndex(Number(event.target.value))}>
-                  {content.services.map((item, index) => (
-                    <option key={item.slug} value={index}>{item.navLabel}</option>
-                  ))}
-                </select>
-              </label>
               <Field label="Menu name" value={service.navLabel} onChange={(navLabel) => updateService({ navLabel })} />
               <Field label="Hero heading" value={service.heroHeading} onChange={(heroHeading) => updateService({ heroHeading })} />
               <Field label="Gold words" value={service.heroHighlight ?? ''} onChange={(heroHighlight) => updateService({ heroHighlight })} />
               <Area label="Hero subtext" value={service.heroSubtext} onChange={(heroSubtext) => updateService({ heroSubtext })} />
-              <MediaField label="Hero photo" accept={imageAccept} value={service.heroImage ?? ''} uploading={uploading === 'service-hero'} onChange={(heroImage) => updateService({ heroImage })} onUpload={(file) => changeMedia('service-hero', file, (current, url) => ({ ...current, services: current.services.map((item, index) => index === serviceIndex ? { ...item, heroImage: url } : item) }))} />
-              <MediaField label="Hero video" accept={mediaAccept} value={service.heroVideo ?? ''} uploading={uploading === 'service-video'} onChange={(heroVideo) => updateService({ heroVideo })} onUpload={(file) => changeMedia('service-video', file, (current, url) => ({ ...current, services: current.services.map((item, index) => index === serviceIndex ? { ...item, heroVideo: url } : item) }))} />
-              <MediaField label="Card photo" accept={imageAccept} value={service.cardImage ?? ''} uploading={uploading === 'service-card'} onChange={(cardImage) => updateService({ cardImage })} onUpload={(file) => changeMedia('service-card', file, (current, url) => ({ ...current, services: current.services.map((item, index) => index === serviceIndex ? { ...item, cardImage: url } : item) }))} />
+              <MediaField label="Hero photo" accept={imageAccept} value={service.heroImage ?? ''} uploading={uploading === `hero-${service.slug}`} onChange={(heroImage) => updateService({ heroImage })} onUpload={(file) => changeMedia(`hero-${service.slug}`, file, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, heroImage: url } : item) }))} />
+              <MediaField label="Hero video" accept={mediaAccept} value={service.heroVideo ?? ''} uploading={uploading === `video-${service.slug}`} onChange={(heroVideo) => updateService({ heroVideo })} onUpload={(file) => changeMedia(`video-${service.slug}`, file, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, heroVideo: url } : item) }))} />
+              <MediaField label="Card photo" accept={imageAccept} value={service.cardImage ?? ''} uploading={uploading === `card-${service.slug}`} onChange={(cardImage) => updateService({ cardImage })} onUpload={(file) => changeMedia(`card-${service.slug}`, file, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, cardImage: url } : item) }))} />
+              <p className="text-sm text-white/60">Hero photo is the large photo at the top of this service page. Card photo is the tile on the services list. Uploading one does not change the other.</p>
               <Field label="Closing heading" value={service.closingHeading} onChange={(closingHeading) => updateService({ closingHeading })} />
               <Area label="Closing text" value={service.closingText} onChange={(closingText) => updateService({ closingText })} />
               <Field label="Closing button" value={service.closingButtonLabel} onChange={(closingButtonLabel) => updateService({ closingButtonLabel })} />
@@ -259,7 +266,7 @@ function Dashboard() {
                 <Field label="Gold words" value={section.highlight ?? ''} onChange={(highlight) => updateSection(sectionIndex, { highlight })} />
                 <Lines label="Paragraphs, one per line" value={section.paragraphs} onChange={(paragraphs) => updateSection(sectionIndex, { paragraphs })} rows={6} />
                 <Lines label="Bullet points, one per line" value={section.bullets ?? []} onChange={(bullets) => updateSection(sectionIndex, { bullets })} />
-                <MediaField label="Photo" accept={imageAccept} value={section.image ?? ''} uploading={uploading === `section-${sectionIndex}`} onChange={(image) => updateSection(sectionIndex, { image })} onUpload={(file) => changeMedia(`section-${sectionIndex}`, file, (current, url) => ({ ...current, services: current.services.map((item, index) => index === serviceIndex ? { ...item, sections: item.sections.map((part, partIndex) => partIndex === sectionIndex ? { ...part, image: url } : part) } : item) }))} />
+                <MediaField label="Photo" accept={imageAccept} value={section.image ?? ''} uploading={uploading === `${service.slug}-section-${sectionIndex}`} onChange={(image) => updateSection(sectionIndex, { image })} onUpload={(file) => changeMedia(`${service.slug}-section-${sectionIndex}`, file, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, sections: item.sections.map((part, partIndex) => partIndex === sectionIndex ? { ...part, image: url } : part) } : item) }))} />
                 <Field label="Button label" value={section.buttonLabel ?? ''} onChange={(buttonLabel) => updateSection(sectionIndex, { buttonLabel })} />
                 <Field label="Button link" value={section.buttonTo ?? ''} onChange={(buttonTo) => updateSection(sectionIndex, { buttonTo })} />
                 <button type="button" className="text-sm text-red-300" onClick={() => updateService({ sections: service.sections.filter((_, index) => index !== sectionIndex) })}>
