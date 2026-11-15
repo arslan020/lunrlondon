@@ -187,7 +187,6 @@ function Dashboard() {
               <Field label="Gold words" value={content.home.heroHighlight} onChange={(heroHighlight) => setContent({ ...content, home: { ...content.home, heroHighlight } })} />
               <Area label="Subtext" value={content.home.heroSubtext} onChange={(heroSubtext) => setContent({ ...content, home: { ...content.home, heroSubtext } })} rows={3} />
               <MediaField label="Hero video" accept={mediaAccept} value={content.home.heroVideo} uploading={uploading === 'hero-video'} onChange={(heroVideo) => setContent({ ...content, home: { ...content.home, heroVideo } })} onUpload={(file) => changeMedia('hero-video', file, (current, url) => ({ ...current, home: { ...current.home, heroVideo: url } }))} />
-              <MediaField label="Hero image" accept={imageAccept} value={content.home.heroImage} uploading={uploading === 'hero-image'} onChange={(heroImage) => setContent({ ...content, home: { ...content.home, heroImage } })} onUpload={(file) => changeMedia('hero-image', file, (current, url) => ({ ...current, home: { ...current.home, heroImage: url } }))} />
             </Section>
             <Section title="Intro">
               <Field label="Heading" value={content.home.luxuryHeading} onChange={(luxuryHeading) => setContent({ ...content, home: { ...content.home, luxuryHeading } })} />
