@@ -124,13 +124,27 @@ async function suggest(input: string, sessionToken: string, apiKey: string) {
   return { status: 200, body: { suggestions } }
 }
 
+function waypoint(id: string, address: string) {
+  if (id) return { placeId: id }
+  if (address.length >= 3) return { address }
+  return null
+}
+
 async function route(input: {
   originPlaceId: string
+  originAddress: string
   destinationPlaceId: string
+  destinationAddress: string
   date: string
   time: string
   apiKey: string
 }) {
+  const origin = waypoint(input.originPlaceId, input.originAddress)
+  const destination = waypoint(input.destinationPlaceId, input.destinationAddress)
+  if (!origin || !destination) {
+    return { status: 400, body: { error: 'Choose a pickup and a drop-off from the address list.' } }
+  }
+
   const departure = londonDeparture(input.date, input.time)
   const useTraffic = Boolean(departure && departure.getTime() > Date.now() + 60_000)
   const response = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
@@ -141,8 +155,8 @@ async function route(input: {
       'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters',
     },
     body: JSON.stringify({
-      origin: { placeId: input.originPlaceId },
-      destination: { placeId: input.destinationPlaceId },
+      origin,
+      destination,
       travelMode: 'DRIVE',
       routingPreference: useTraffic ? 'TRAFFIC_AWARE' : 'TRAFFIC_UNAWARE',
       ...(useTraffic && departure ? { departureTime: departure.toISOString() } : {}),
@@ -193,12 +207,14 @@ export async function deliverQuote(input: unknown) {
   if (action === 'route') {
     const originPlaceId = placeId(body.originPlaceId)
     const destinationPlaceId = placeId(body.destinationPlaceId)
-    if (!originPlaceId || !destinationPlaceId || originPlaceId === destinationPlaceId) {
+    if (originPlaceId && destinationPlaceId && originPlaceId === destinationPlaceId) {
       return { status: 400, body: { error: 'Choose a pickup and a drop-off from the address list.' } }
     }
     return route({
       originPlaceId,
+      originAddress: text(body.originAddress, 200),
       destinationPlaceId,
+      destinationAddress: text(body.destinationAddress, 200),
       date: text(body.date, 10),
       time: text(body.time, 5),
       apiKey,

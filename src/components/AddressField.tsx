@@ -66,7 +66,7 @@ function AddressField({ label, value, placeId, placeholder, required, className,
   }
 
   return (
-    <label className="relative block text-sm font-medium">
+    <label className={`relative block text-sm font-medium ${open ? 'z-30' : ''}`}>
       {label}
       <input
         required={required}

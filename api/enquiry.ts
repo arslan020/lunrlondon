@@ -182,6 +182,7 @@ function enquiryMessage(input: Record<string, string>): BuiltEnquiry {
       { label: 'Time', value: time },
       { label: 'Hours', value: field(input.hours, 10) },
       { label: 'Return', value: field(input.returning, 10) },
+      { label: 'Return address', value: field(input.returnAddress, 300) },
       { label: 'Vehicle', value: vehicle },
       { label: 'Quote note', value: summary },
     ]

@@ -29,6 +29,8 @@ function Book() {
   const [pickupPlaceId, setPickupPlaceId] = useState('')
   const [dropoff, setDropoff] = useState('')
   const [dropoffPlaceId, setDropoffPlaceId] = useState('')
+  const [returnAddress, setReturnAddress] = useState('')
+  const [returnPlaceId, setReturnPlaceId] = useState('')
   const [airportId, setAirportId] = useState(airports[1].id)
   const [date, setDate] = useState('')
   const [time, setTime] = useState('21:15')
@@ -45,6 +47,7 @@ function Book() {
   const [routeState, setRouteState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
   const [routeError, setRouteError] = useState('')
 
+  const selectedAirport = airports.find((airport) => airport.id === airportId)
   const chargedHours = tripType === 'one-way' && route ? route.billedHours : undefined
   const quoteOptions = { tripType, hours, airportId, pickup, dropoff, returning, chargedHours }
 
@@ -54,7 +57,14 @@ function Book() {
   )
 
   useEffect(() => {
-    if (tripType !== 'one-way' || !pickupPlaceId || !dropoffPlaceId) {
+    const airportDestination = tripType === 'airport' && selectedAirport ? `${selectedAirport.name} Airport, United Kingdom` : ''
+    const destinationPlaceId = tripType === 'airport' && !dropoffPlaceId ? '' : dropoffPlaceId
+    const canRoute =
+      Boolean(pickupPlaceId) &&
+      (tripType === 'one-way' || tripType === 'airport') &&
+      Boolean(destinationPlaceId || airportDestination)
+
+    if (!canRoute) {
       setRoute(null)
       setRouteState('idle')
       setRouteError('')
@@ -70,7 +80,8 @@ function Book() {
         body: JSON.stringify({
           action: 'route',
           originPlaceId: pickupPlaceId,
-          destinationPlaceId: dropoffPlaceId,
+          destinationPlaceId,
+          destinationAddress: destinationPlaceId ? '' : airportDestination,
           date,
           time,
         }),
@@ -111,7 +122,7 @@ function Book() {
       clearTimeout(timer)
       controller.abort()
     }
-  }, [tripType, pickupPlaceId, dropoffPlaceId, date, time])
+  }, [tripType, pickupPlaceId, dropoffPlaceId, selectedAirport, date, time])
 
   const goNext = (event: FormEvent) => {
     event.preventDefault()
@@ -139,10 +150,11 @@ function Book() {
         time,
         hours: tripType === 'hourly' ? String(hours) : '',
         returning: returning ? 'Yes' : 'No',
+        returnAddress: returning ? returnAddress : '',
         vehicle: vehicle?.name ?? '',
         quote: selectedQuote?.amount != null ? formatPrice(selectedQuote.amount) : '',
         summary: [
-          route && tripType === 'one-way' ? `${route.miles} miles, about ${route.minutes} minutes, charged as ${route.billedHours} hours` : '',
+          route && tripType !== 'hourly' ? `${route.miles} miles, about ${route.minutes} minutes${tripType === 'one-way' ? `, charged as ${route.billedHours} hours` : ''}` : '',
           selectedQuote?.summary ?? '',
         ]
           .filter(Boolean)
@@ -158,9 +170,11 @@ function Book() {
   }
 
   return (
-    <section className="relative overflow-hidden pb-16 pl-4 pr-16 pt-28 sm:pl-6 sm:pr-20 md:pt-32">
-      <img src="/images/fleet-night.jpg" alt="" className="absolute inset-0 h-full w-full object-cover object-center" />
-      <div className="absolute inset-0 bg-black/25" />
+    <section className="relative pb-16 pl-4 pr-16 pt-28 sm:pl-6 sm:pr-20 md:pt-32">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <img src="/images/fleet-night.jpg" alt="" className="h-full w-full object-cover object-center" />
+        <div className="absolute inset-0 bg-black/25" />
+      </div>
       <div className="relative mx-auto grid w-full min-w-0 max-w-content items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
         <div className="min-w-0 rounded-2xl border border-white/20 bg-black/35 p-4 text-white shadow-2xl backdrop-blur-md sm:p-6" style={{ colorScheme: 'dark' }}>
           {submitted ? (
@@ -279,40 +293,63 @@ function Book() {
                   <button
                     type="button"
                     onClick={() => setReturning((value) => !value)}
-                    className="ml-auto flex items-center gap-2 text-sm font-semibold"
+                    className={`ml-auto flex items-center gap-2 text-sm font-semibold ${returning ? 'text-brand-primary' : ''}`}
                   >
                     <span className="text-lg leading-none">+</span>
                     {returning ? 'Return booking added' : 'Add Return Booking'}
                   </button>
 
-                  {tripType === 'one-way' && (routeState === 'loading' || route || routeError) && (
+                  {returning && (
+                    <AddressField
+                      label="Return Address"
+                      value={returnAddress}
+                      placeId={returnPlaceId}
+                      placeholder="Where should we bring you back?"
+                      className={fieldClass}
+                      onChange={(text, id) => {
+                        setReturnAddress(text)
+                        setReturnPlaceId(id)
+                      }}
+                    />
+                  )}
+
+                  {(tripType !== 'one-way' || routeState === 'loading' || route || routeError) && (
                     <div className="rounded-xl border border-white/15 bg-black/40 p-4">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-primary">Estimated fare</p>
-                      {routeState === 'loading' && <p className="mt-2 text-sm text-white/70">Checking the route…</p>}
-                      {routeState === 'error' && <p className="mt-2 text-sm text-white/70">{routeError}</p>}
-                      {route && (
-                        <>
-                          <p className="mt-2 text-sm text-white/75">
-                            {route.miles} miles, about {route.minutes} minutes{route.traffic ? ' with traffic' : ''}. Charged as {route.billedHours}{' '}
-                            hours.
-                            {returning ? ' A return doubles the fare.' : ''}
-                          </p>
-                          <ul className="mt-3 divide-y divide-white/10">
-                            {vehicles.map((vehicle) => {
-                              const quote = journeyPrice({ ...quoteOptions, vehicleId: vehicle.id })
-                              return (
-                                <li key={vehicle.id} className="flex items-center justify-between gap-3 py-2 text-sm">
-                                  <span>{vehicle.name}</span>
-                                  <span className="font-semibold text-brand-primary">
-                                    {quote?.amount != null ? formatPrice(quote.amount) : 'Quote'}
-                                  </span>
-                                </li>
-                              )
-                            })}
-                          </ul>
-                          <p className="mt-2 text-xs text-white/45">These rates are temporary. The team confirms the fare before you travel.</p>
-                        </>
+                      {tripType !== 'hourly' && routeState === 'loading' && <p className="mt-2 text-sm text-white/70">Checking the route…</p>}
+                      {tripType !== 'hourly' && routeState === 'error' && <p className="mt-2 text-sm text-white/70">{routeError}</p>}
+                      {tripType !== 'hourly' && route && (
+                        <p className="mt-2 text-sm text-white/75">
+                          {route.miles} miles, about {route.minutes} minutes{route.traffic ? ' with traffic' : ''}.
+                          {tripType === 'one-way' ? ` Charged as ${route.billedHours} hours.` : ' Fixed airport fare.'}
+                          {returning ? ' A return doubles the fare.' : ''}
+                        </p>
                       )}
+                      {tripType === 'hourly' && (
+                        <p className="mt-2 text-sm text-white/75">
+                          {Math.max(hours || minimumHours, minimumHours)} hours at the hourly rate.
+                          {returning ? ' A return doubles the fare.' : ''}
+                        </p>
+                      )}
+                      {tripType === 'airport' && !route && routeState !== 'loading' && (
+                        <p className="mt-2 text-sm text-white/75">
+                          {selectedAirport?.name} fixed fare.{returning ? ' A return doubles the fare.' : ''}
+                        </p>
+                      )}
+                      <ul className="mt-3 divide-y divide-white/10">
+                        {vehicles.map((vehicle) => {
+                          const quote = journeyPrice({ ...quoteOptions, vehicleId: vehicle.id })
+                          return (
+                            <li key={vehicle.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+                              <span>{vehicle.name}</span>
+                              <span className="font-semibold text-brand-primary">
+                                {quote?.amount != null ? formatPrice(quote.amount) : 'Quote'}
+                              </span>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                      <p className="mt-2 text-xs text-white/45">These rates are temporary. The team confirms the fare before you travel.</p>
                     </div>
                   )}
 
