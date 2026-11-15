@@ -33,6 +33,7 @@ export function MediaField({
   uploading,
   onUpload,
   onChange,
+  onRemove,
 }: {
   label: string
   value: string
@@ -40,6 +41,7 @@ export function MediaField({
   uploading: boolean
   onUpload: (file: File) => void
   onChange: (value: string) => void
+  onRemove?: () => void
 }) {
   const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(value) || value.startsWith('data:video')
   return (
@@ -52,20 +54,27 @@ export function MediaField({
           <img src={value} alt="" className="mt-2 max-h-40 w-full rounded-lg bg-black object-contain" />
         ))}
       <input className={inputClass} value={value} onChange={(event) => onChange(event.target.value)} placeholder="/images/photo.jpg or a full URL" />
-      <label className="mt-2 inline-flex cursor-pointer rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white">
-        {uploading ? 'Uploading…' : 'Upload'}
-        <input
-          type="file"
-          accept={accept}
-          className="hidden"
-          disabled={uploading}
-          onChange={(event) => {
-            const file = event.target.files?.[0]
-            event.target.value = ''
-            if (file) onUpload(file)
-          }}
-        />
-      </label>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <label className="inline-flex cursor-pointer rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white">
+          {uploading ? 'Uploading…' : 'Upload'}
+          <input
+            type="file"
+            accept={accept}
+            className="hidden"
+            disabled={uploading}
+            onChange={(event) => {
+              const file = event.target.files?.[0]
+              event.target.value = ''
+              if (file) onUpload(file)
+            }}
+          />
+        </label>
+        {value && onRemove && (
+          <button type="button" className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-red-300 disabled:opacity-60" disabled={uploading} onClick={onRemove}>
+            Remove
+          </button>
+        )}
+      </div>
     </div>
   )
 }

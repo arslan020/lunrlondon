@@ -92,6 +92,14 @@ function Dashboard() {
     return data.url
   }
 
+  async function clearMedia(apply: (current: SiteContent, url: string) => SiteContent) {
+    setError('')
+    setStatus('')
+    const next = apply(content as SiteContent, '')
+    setContent(next)
+    await persist(next, 'Photo removed. Upload a new one when you are ready.')
+  }
+
   async function changeMedia(key: string, file: File, apply: (current: SiteContent, url: string) => SiteContent) {
     setUploading(key)
     setError('')
@@ -128,6 +136,14 @@ function Dashboard() {
       sections: service.sections.map((section, index) => (index === sectionIndex ? { ...section, ...patch } : section)),
     })
   }
+  const bindMedia = (key: string, value: string, accept: string, apply: (current: SiteContent, url: string) => SiteContent) => ({
+    accept,
+    value,
+    uploading: uploading === key,
+    onChange: (url: string) => setContent(apply(content, url)),
+    onUpload: (file: File) => changeMedia(key, file, apply),
+    onRemove: () => clearMedia(apply),
+  })
 
   return (
     <main className="min-h-screen bg-black pb-24 text-white">
@@ -177,7 +193,7 @@ function Dashboard() {
           <Section title="Site">
             <Field label="Brand name" value={content.site.brandName} onChange={(brandName) => setContent({ ...content, site: { ...content.site, brandName } })} />
             <Field label="Tagline" value={content.site.tagline} onChange={(tagline) => setContent({ ...content, site: { ...content.site, tagline } })} />
-            <MediaField label="Logo" accept={imageAccept} value={content.site.logo} uploading={uploading === 'logo'} onChange={(logo) => setContent({ ...content, site: { ...content.site, logo } })} onUpload={(file) => changeMedia('logo', file, (current, url) => ({ ...current, site: { ...current.site, logo: url } }))} />
+            <MediaField label="Logo" {...bindMedia('logo', content.site.logo, imageAccept, (current, url) => ({ ...current, site: { ...current.site, logo: url } }))} />
             <Field label="WhatsApp" value={content.site.whatsapp} onChange={(whatsapp) => setContent({ ...content, site: { ...content.site, whatsapp } })} />
             <Field label="Phone" value={content.site.phone} onChange={(phone) => setContent({ ...content, site: { ...content.site, phone } })} />
             <Field label="Mobile" value={content.site.mobile} onChange={(mobile) => setContent({ ...content, site: { ...content.site, mobile } })} />
@@ -196,7 +212,7 @@ function Dashboard() {
               <Field label="Heading" value={content.home.heroHeading} onChange={(heroHeading) => setContent({ ...content, home: { ...content.home, heroHeading } })} />
               <Field label="Gold words" value={content.home.heroHighlight} onChange={(heroHighlight) => setContent({ ...content, home: { ...content.home, heroHighlight } })} />
               <Area label="Subtext" value={content.home.heroSubtext} onChange={(heroSubtext) => setContent({ ...content, home: { ...content.home, heroSubtext } })} rows={3} />
-              <MediaField label="Hero video" accept={mediaAccept} value={content.home.heroVideo} uploading={uploading === 'hero-video'} onChange={(heroVideo) => setContent({ ...content, home: { ...content.home, heroVideo } })} onUpload={(file) => changeMedia('hero-video', file, (current, url) => ({ ...current, home: { ...current.home, heroVideo: url } }))} />
+              <MediaField label="Hero video" {...bindMedia('hero-video', content.home.heroVideo, mediaAccept, (current, url) => ({ ...current, home: { ...current.home, heroVideo: url } }))} />
             </Section>
             <Section title="Intro">
               <Field label="Heading" value={content.home.luxuryHeading} onChange={(luxuryHeading) => setContent({ ...content, home: { ...content.home, luxuryHeading } })} />
@@ -213,11 +229,11 @@ function Dashboard() {
               <Area label="Time text" value={content.home.trustTimeText} onChange={(trustTimeText) => setContent({ ...content, home: { ...content.home, trustTimeText } })} />
               <Field label="Discretion heading" value={content.home.trustDiscretionHeading} onChange={(trustDiscretionHeading) => setContent({ ...content, home: { ...content.home, trustDiscretionHeading } })} />
               <Area label="Discretion text" value={content.home.trustDiscretionText} onChange={(trustDiscretionText) => setContent({ ...content, home: { ...content.home, trustDiscretionText } })} />
-              <MediaField label="Trust photo" accept={imageAccept} value={content.home.trustImage} uploading={uploading === 'trust'} onChange={(trustImage) => setContent({ ...content, home: { ...content.home, trustImage } })} onUpload={(file) => changeMedia('trust', file, (current, url) => ({ ...current, home: { ...current.home, trustImage: url } }))} />
+              <MediaField label="Trust photo" {...bindMedia('trust', content.home.trustImage, imageAccept, (current, url) => ({ ...current, home: { ...current.home, trustImage: url } }))} />
               <Field label="Respect heading" value={content.home.respectHeading} onChange={(respectHeading) => setContent({ ...content, home: { ...content.home, respectHeading } })} />
               <Field label="Respect gold words" value={content.home.respectHighlight} onChange={(respectHighlight) => setContent({ ...content, home: { ...content.home, respectHighlight } })} />
               <Lines label="Respect paragraphs" value={content.home.respectParagraphs} onChange={(respectParagraphs) => setContent({ ...content, home: { ...content.home, respectParagraphs } })} />
-              <MediaField label="Respect photo" accept={imageAccept} value={content.home.respectImage} uploading={uploading === 'respect'} onChange={(respectImage) => setContent({ ...content, home: { ...content.home, respectImage } })} onUpload={(file) => changeMedia('respect', file, (current, url) => ({ ...current, home: { ...current.home, respectImage: url } }))} />
+              <MediaField label="Respect photo" {...bindMedia('respect', content.home.respectImage, imageAccept, (current, url) => ({ ...current, home: { ...current.home, respectImage: url } }))} />
             </Section>
             <Section title="Reviews, fleet and close">
               <Field label="Reviews heading" value={content.home.reviewsHeading} onChange={(reviewsHeading) => setContent({ ...content, home: { ...content.home, reviewsHeading } })} />
@@ -228,7 +244,7 @@ function Dashboard() {
               <Area label="Fleet text" value={content.home.fleetText} onChange={(fleetText) => setContent({ ...content, home: { ...content.home, fleetText } })} />
               <Lines label="Fleet points" value={content.home.fleetBullets} onChange={(fleetBullets) => setContent({ ...content, home: { ...content.home, fleetBullets } })} />
               <Field label="Fleet note" value={content.home.fleetNote} onChange={(fleetNote) => setContent({ ...content, home: { ...content.home, fleetNote } })} />
-              <MediaField label="Fleet photo" accept={imageAccept} value={content.home.fleetImage} uploading={uploading === 'home-fleet'} onChange={(fleetImage) => setContent({ ...content, home: { ...content.home, fleetImage } })} onUpload={(file) => changeMedia('home-fleet', file, (current, url) => ({ ...current, home: { ...current.home, fleetImage: url } }))} />
+              <MediaField label="Fleet photo" {...bindMedia('home-fleet', content.home.fleetImage, imageAccept, (current, url) => ({ ...current, home: { ...current.home, fleetImage: url } }))} />
               <Field label="Closing heading" value={content.home.closingHeading} onChange={(closingHeading) => setContent({ ...content, home: { ...content.home, closingHeading } })} />
               <Area label="Closing text" value={content.home.closingText} onChange={(closingText) => setContent({ ...content, home: { ...content.home, closingText } })} />
             </Section>
@@ -252,9 +268,9 @@ function Dashboard() {
               <Field label="Hero heading" value={service.heroHeading} onChange={(heroHeading) => updateService({ heroHeading })} />
               <Field label="Gold words" value={service.heroHighlight ?? ''} onChange={(heroHighlight) => updateService({ heroHighlight })} />
               <Area label="Hero subtext" value={service.heroSubtext} onChange={(heroSubtext) => updateService({ heroSubtext })} />
-              <MediaField label="Hero photo" accept={imageAccept} value={service.heroImage ?? ''} uploading={uploading === `hero-${service.slug}`} onChange={(heroImage) => updateService({ heroImage })} onUpload={(file) => changeMedia(`hero-${service.slug}`, file, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, heroImage: url } : item) }))} />
-              <MediaField label="Hero video" accept={mediaAccept} value={service.heroVideo ?? ''} uploading={uploading === `video-${service.slug}`} onChange={(heroVideo) => updateService({ heroVideo })} onUpload={(file) => changeMedia(`video-${service.slug}`, file, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, heroVideo: url } : item) }))} />
-              <MediaField label="Card photo" accept={imageAccept} value={service.cardImage ?? ''} uploading={uploading === `card-${service.slug}`} onChange={(cardImage) => updateService({ cardImage })} onUpload={(file) => changeMedia(`card-${service.slug}`, file, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, cardImage: url } : item) }))} />
+              <MediaField label="Hero photo" {...bindMedia(`hero-${service.slug}`, service.heroImage ?? '', imageAccept, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, heroImage: url } : item) }))} />
+              <MediaField label="Hero video" {...bindMedia(`video-${service.slug}`, service.heroVideo ?? '', mediaAccept, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, heroVideo: url } : item) }))} />
+              <MediaField label="Card photo" {...bindMedia(`card-${service.slug}`, service.cardImage ?? '', imageAccept, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, cardImage: url } : item) }))} />
               <p className="text-sm text-white/60">Hero photo is the large photo at the top of this service page. Card photo is the tile on the services list. Uploading one does not change the other.</p>
               <Field label="Closing heading" value={service.closingHeading} onChange={(closingHeading) => updateService({ closingHeading })} />
               <Area label="Closing text" value={service.closingText} onChange={(closingText) => updateService({ closingText })} />
@@ -266,7 +282,7 @@ function Dashboard() {
                 <Field label="Gold words" value={section.highlight ?? ''} onChange={(highlight) => updateSection(sectionIndex, { highlight })} />
                 <Lines label="Paragraphs, one per line" value={section.paragraphs} onChange={(paragraphs) => updateSection(sectionIndex, { paragraphs })} rows={6} />
                 <Lines label="Bullet points, one per line" value={section.bullets ?? []} onChange={(bullets) => updateSection(sectionIndex, { bullets })} />
-                <MediaField label="Photo" accept={imageAccept} value={section.image ?? ''} uploading={uploading === `${service.slug}-section-${sectionIndex}`} onChange={(image) => updateSection(sectionIndex, { image })} onUpload={(file) => changeMedia(`${service.slug}-section-${sectionIndex}`, file, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, sections: item.sections.map((part, partIndex) => partIndex === sectionIndex ? { ...part, image: url } : part) } : item) }))} />
+                <MediaField label="Photo" {...bindMedia(`${service.slug}-section-${sectionIndex}`, section.image ?? '', imageAccept, (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, sections: item.sections.map((part, partIndex) => partIndex === sectionIndex ? { ...part, image: url } : part) } : item) }))} />
                 <Field label="Button label" value={section.buttonLabel ?? ''} onChange={(buttonLabel) => updateSection(sectionIndex, { buttonLabel })} />
                 <Field label="Button link" value={section.buttonTo ?? ''} onChange={(buttonTo) => updateSection(sectionIndex, { buttonTo })} />
                 <button type="button" className="text-sm text-red-300" onClick={() => updateService({ sections: service.sections.filter((_, index) => index !== sectionIndex) })}>
@@ -289,8 +305,8 @@ function Dashboard() {
             <Field label="Heading" value={content.fleet.heading} onChange={(heading) => setContent({ ...content, fleet: { ...content.fleet, heading } })} />
             <Field label="Gold words" value={content.fleet.highlight} onChange={(highlight) => setContent({ ...content, fleet: { ...content.fleet, highlight } })} />
             <Area label="Subtext" value={content.fleet.subtext} onChange={(subtext) => setContent({ ...content, fleet: { ...content.fleet, subtext } })} />
-            <MediaField label="Hero photo" accept={imageAccept} value={content.fleet.image} uploading={uploading === 'fleet-image'} onChange={(image) => setContent({ ...content, fleet: { ...content.fleet, image } })} onUpload={(file) => changeMedia('fleet-image', file, (current, url) => ({ ...current, fleet: { ...current.fleet, image: url } }))} />
-            <MediaField label="Hero video" accept={mediaAccept} value={content.fleet.video} uploading={uploading === 'fleet-video'} onChange={(video) => setContent({ ...content, fleet: { ...content.fleet, video } })} onUpload={(file) => changeMedia('fleet-video', file, (current, url) => ({ ...current, fleet: { ...current.fleet, video: url } }))} />
+            <MediaField label="Hero photo" {...bindMedia('fleet-image', content.fleet.image, imageAccept, (current, url) => ({ ...current, fleet: { ...current.fleet, image: url } }))} />
+            <MediaField label="Hero video" {...bindMedia('fleet-video', content.fleet.video, mediaAccept, (current, url) => ({ ...current, fleet: { ...current.fleet, video: url } }))} />
             <Field label="Intro heading" value={content.fleet.introHeading} onChange={(introHeading) => setContent({ ...content, fleet: { ...content.fleet, introHeading } })} />
             <Area label="Intro text" value={content.fleet.introText} onChange={(introText) => setContent({ ...content, fleet: { ...content.fleet, introText } })} />
             <Field label="Closing heading" value={content.fleet.closingHeading} onChange={(closingHeading) => setContent({ ...content, fleet: { ...content.fleet, closingHeading } })} />
@@ -308,7 +324,7 @@ function Dashboard() {
                 <Field label="Short name" value={vehicle.shortName} onChange={(shortName) => setContent({ ...content, vehicles: content.vehicles.map((item, itemIndex) => itemIndex === index ? { ...item, shortName } : item) })} />
                 <Field label="Seats" value={vehicle.seats} onChange={(seats) => setContent({ ...content, vehicles: content.vehicles.map((item, itemIndex) => itemIndex === index ? { ...item, seats } : item) })} />
                 <Field label="Price per hour" value={String(vehicle.hourly)} onChange={(hourly) => setContent({ ...content, vehicles: content.vehicles.map((item, itemIndex) => itemIndex === index ? { ...item, hourly: Number(hourly) || 0 } : item) })} />
-                <MediaField label="Photo" accept={imageAccept} value={vehicle.image} uploading={uploading === vehicle.id} onChange={(image) => setContent({ ...content, vehicles: content.vehicles.map((item, itemIndex) => itemIndex === index ? { ...item, image } : item) })} onUpload={(file) => changeMedia(vehicle.id, file, (current, url) => ({ ...current, vehicles: current.vehicles.map((item) => item.id === vehicle.id ? { ...item, image: url } : item) }))} />
+                <MediaField label="Photo" {...bindMedia(vehicle.id, vehicle.image, imageAccept, (current, url) => ({ ...current, vehicles: current.vehicles.map((item) => item.id === vehicle.id ? { ...item, image: url } : item) }))} />
               </div>
             ))}
             {content.airports.map((airport, airportIndex) => (
@@ -340,7 +356,7 @@ function Dashboard() {
               <Area label="Subtext" value={content.faqsPage.subtext} onChange={(subtext) => setContent({ ...content, faqsPage: { ...content.faqsPage, subtext } })} />
               <Field label="Section heading" value={content.faqsPage.sectionHeading} onChange={(sectionHeading) => setContent({ ...content, faqsPage: { ...content.faqsPage, sectionHeading } })} />
               <Area label="Section text" value={content.faqsPage.sectionText} onChange={(sectionText) => setContent({ ...content, faqsPage: { ...content.faqsPage, sectionText } })} />
-              <MediaField label="Photo" accept={imageAccept} value={content.faqsPage.image} uploading={uploading === 'faq-image'} onChange={(image) => setContent({ ...content, faqsPage: { ...content.faqsPage, image } })} onUpload={(file) => changeMedia('faq-image', file, (current, url) => ({ ...current, faqsPage: { ...current.faqsPage, image: url } }))} />
+              <MediaField label="Photo" {...bindMedia('faq-image', content.faqsPage.image, imageAccept, (current, url) => ({ ...current, faqsPage: { ...current.faqsPage, image: url } }))} />
               <Field label="Closing heading" value={content.faqsPage.closingHeading} onChange={(closingHeading) => setContent({ ...content, faqsPage: { ...content.faqsPage, closingHeading } })} />
               <Area label="Closing text" value={content.faqsPage.closingText} onChange={(closingText) => setContent({ ...content, faqsPage: { ...content.faqsPage, closingText } })} />
             </Section>
@@ -378,14 +394,14 @@ function Dashboard() {
             <Field label="Eyebrow" value={content.contact.eyebrow} onChange={(eyebrow) => setContent({ ...content, contact: { ...content.contact, eyebrow } })} />
             <Field label="Heading" value={content.contact.heading} onChange={(heading) => setContent({ ...content, contact: { ...content.contact, heading } })} />
             <Area label="Lead" value={content.contact.lead} onChange={(lead) => setContent({ ...content, contact: { ...content.contact, lead } })} />
-            <MediaField label="Top photo" accept={imageAccept} value={content.contact.heroImage} uploading={uploading === 'contact-hero'} onChange={(heroImage) => setContent({ ...content, contact: { ...content.contact, heroImage } })} onUpload={(file) => changeMedia('contact-hero', file, (current, url) => ({ ...current, contact: { ...current.contact, heroImage: url } }))} />
+            <MediaField label="Top photo" {...bindMedia('contact-hero', content.contact.heroImage, imageAccept, (current, url) => ({ ...current, contact: { ...current.contact, heroImage: url } }))} />
             <Field label="Card eyebrow" value={content.contact.cardEyebrow} onChange={(cardEyebrow) => setContent({ ...content, contact: { ...content.contact, cardEyebrow } })} />
             <Field label="Card heading" value={content.contact.cardHeading} onChange={(cardHeading) => setContent({ ...content, contact: { ...content.contact, cardHeading } })} />
             <Area label="Card text" value={content.contact.cardText} onChange={(cardText) => setContent({ ...content, contact: { ...content.contact, cardText } })} />
             <Field label="Brief eyebrow" value={content.contact.briefEyebrow} onChange={(briefEyebrow) => setContent({ ...content, contact: { ...content.contact, briefEyebrow } })} />
             <Field label="Brief heading" value={content.contact.briefHeading} onChange={(briefHeading) => setContent({ ...content, contact: { ...content.contact, briefHeading } })} />
             <Area label="Brief text" value={content.contact.briefText} onChange={(briefText) => setContent({ ...content, contact: { ...content.contact, briefText } })} />
-            <MediaField label="Brief photo" accept={imageAccept} value={content.contact.briefImage} uploading={uploading === 'contact-brief'} onChange={(briefImage) => setContent({ ...content, contact: { ...content.contact, briefImage } })} onUpload={(file) => changeMedia('contact-brief', file, (current, url) => ({ ...current, contact: { ...current.contact, briefImage: url } }))} />
+            <MediaField label="Brief photo" {...bindMedia('contact-brief', content.contact.briefImage, imageAccept, (current, url) => ({ ...current, contact: { ...current.contact, briefImage: url } }))} />
             {content.contact.steps.map((step, index) => (
               <div key={step.number + index} className="grid gap-2 rounded-xl border border-white/10 p-3">
                 <Field label="Step number" value={step.number} onChange={(number) => setContent({ ...content, contact: { ...content.contact, steps: content.contact.steps.map((item, itemIndex) => itemIndex === index ? { ...item, number } : item) } })} />
@@ -398,7 +414,7 @@ function Dashboard() {
 
         {tab === 'Book' && (
           <Section title="Booking page">
-            <MediaField label="Background photo" accept={imageAccept} value={content.book.backgroundImage} uploading={uploading === 'book'} onChange={(backgroundImage) => setContent({ ...content, book: { backgroundImage } })} onUpload={(file) => changeMedia('book', file, (current, url) => ({ ...current, book: { backgroundImage: url } }))} />
+            <MediaField label="Background photo" {...bindMedia('book', content.book.backgroundImage, imageAccept, (current, url) => ({ ...current, book: { backgroundImage: url } }))} />
             <p className="text-sm text-white/60">Fares on the booking form use the Prices tab.</p>
           </Section>
         )}

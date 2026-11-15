@@ -172,7 +172,7 @@ function Book() {
   return (
     <section className="relative pb-16 pl-4 pr-16 pt-28 sm:pl-6 sm:pr-20 md:pt-32">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <img src={book.backgroundImage} alt="" className="h-full w-full object-cover object-center" />
+        {book.backgroundImage && <img src={book.backgroundImage} alt="" className="h-full w-full object-cover object-center" />}
         <div className="absolute inset-0 bg-black/25" />
       </div>
       <div className="relative mx-auto grid w-full min-w-0 max-w-content items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,0.85fr)]">
@@ -375,7 +375,11 @@ function Book() {
                             selected ? 'border-brand-primary bg-white/15' : 'border-white/15 bg-white/5'
                           }`}
                         >
-                          <img src={vehicle.image} alt="" className="h-14 w-16 shrink-0 rounded-lg bg-neutral-200 object-contain sm:h-16 sm:w-20" />
+                          {vehicle.image ? (
+                            <img src={vehicle.image} alt="" className="h-14 w-16 shrink-0 rounded-lg bg-neutral-200 object-contain sm:h-16 sm:w-20" />
+                          ) : (
+                            <span className="h-14 w-16 shrink-0 rounded-lg bg-neutral-200 sm:h-16 sm:w-20" />
+                          )}
                           <span className="min-w-0 flex-1">
                             <span className="block font-semibold">{vehicle.shortName}</span>
                             <span className="block text-xs text-white/50">

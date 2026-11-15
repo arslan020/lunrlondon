@@ -46,11 +46,13 @@ function OurLuxuryFleet() {
           {vehicles.map((vehicle) => (
             <article key={vehicle.id} className="flex h-full flex-col overflow-hidden rounded-[1rem] bg-[#141413]">
               <div className="aspect-[3/2] overflow-hidden bg-[#141413]">
-                <img
-                  src={vehicle.image}
-                  alt={vehicle.name}
-                  className={`h-full w-full object-cover ${cardImagePosition[vehicle.id]}`}
-                />
+                {vehicle.image && (
+                  <img
+                    src={vehicle.image}
+                    alt={vehicle.name}
+                    className={`h-full w-full object-cover ${cardImagePosition[vehicle.id]}`}
+                  />
+                )}
               </div>
               <div className="flex flex-1 flex-col p-5">
                 <h3 className="font-serif text-3xl text-white">{vehicle.shortName}</h3>

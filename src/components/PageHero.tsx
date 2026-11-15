@@ -77,9 +77,9 @@ function PageHero({
         />
       ) : image ? (
         <img src={image} alt="" className={`absolute inset-0 h-full w-full brightness-110 ${imageFit === 'contain' ? 'object-contain' : 'object-cover'} ${imagePosition}`} />
-      ) : (
+      ) : image == null ? (
         <img src="/images/hero.jpg" alt="" className="absolute inset-0 h-full w-full object-cover brightness-110" />
-      )}
+      ) : null}
       <div className={`absolute inset-0 ${scrim === 'soft' ? 'bg-black/10' : 'bg-black/25'}`} />
       <div
         className={`absolute inset-0 bg-gradient-to-t ${
