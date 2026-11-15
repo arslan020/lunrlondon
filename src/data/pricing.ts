@@ -87,6 +87,7 @@ export function journeyPrice(options: {
   pickup: string
   dropoff: string
   returning: boolean
+  chargedHours?: number
 }) {
   const vehicle = vehicleById(options.vehicleId)
   if (!vehicle) return null
@@ -120,10 +121,16 @@ export function journeyPrice(options: {
     }
   }
 
-  const hours = minimumHours
+  const hours =
+    options.chargedHours && options.chargedHours > 0
+      ? Math.max(options.chargedHours, minimumHours)
+      : minimumHours
   const amount = vehicle.hourly * hours * (options.returning ? 2 : 1)
   return {
     amount,
-    summary: `From ${formatPrice(vehicle.hourly)} per hour, ${hours}-hour minimum${options.returning ? ', including the return' : ''}. The final fare is confirmed against the route.`,
+    summary:
+      options.chargedHours && options.chargedHours > 0
+        ? `${formatPrice(vehicle.hourly)} per hour × ${hours} hour${hours === 1 ? '' : 's'}${options.returning ? ', including the return' : ''}`
+        : `From ${formatPrice(vehicle.hourly)} per hour, ${hours}-hour minimum${options.returning ? ', including the return' : ''}. The final fare is confirmed against the route.`,
   }
 }

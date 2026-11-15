@@ -1,4 +1,5 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import AddressField from '../components/AddressField'
 import {
   airports,
   formatPrice,
@@ -25,7 +26,9 @@ function Book() {
   const [step, setStep] = useState<1 | 2>(1)
   const [tripType, setTripType] = useState<TripType>('one-way')
   const [pickup, setPickup] = useState('')
+  const [pickupPlaceId, setPickupPlaceId] = useState('')
   const [dropoff, setDropoff] = useState('')
+  const [dropoffPlaceId, setDropoffPlaceId] = useState('')
   const [airportId, setAirportId] = useState(airports[1].id)
   const [date, setDate] = useState('')
   const [time, setTime] = useState('21:15')
@@ -38,13 +41,77 @@ function Book() {
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
+  const [route, setRoute] = useState<{ miles: number; minutes: number; billedHours: number; traffic: boolean } | null>(null)
+  const [routeState, setRouteState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
+  const [routeError, setRouteError] = useState('')
 
-  const quoteOptions = { tripType, hours, airportId, pickup, dropoff, returning }
+  const chargedHours = tripType === 'one-way' && route ? route.billedHours : undefined
+  const quoteOptions = { tripType, hours, airportId, pickup, dropoff, returning, chargedHours }
 
   const selectedQuote = useMemo(
     () => journeyPrice({ ...quoteOptions, vehicleId }),
-    [tripType, hours, airportId, pickup, dropoff, returning, vehicleId],
+    [tripType, hours, airportId, pickup, dropoff, returning, vehicleId, chargedHours],
   )
+
+  useEffect(() => {
+    if (tripType !== 'one-way' || !pickupPlaceId || !dropoffPlaceId) {
+      setRoute(null)
+      setRouteState('idle')
+      setRouteError('')
+      return
+    }
+
+    const controller = new AbortController()
+    setRouteState('loading')
+    const timer = setTimeout(() => {
+      void fetch('/api/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'route',
+          originPlaceId: pickupPlaceId,
+          destinationPlaceId: dropoffPlaceId,
+          date,
+          time,
+        }),
+        signal: controller.signal,
+      })
+        .then(async (response) => {
+          const data = (await response.json()) as {
+            error?: string
+            miles?: number
+            minutes?: number
+            billedHours?: number
+            traffic?: boolean
+          }
+          if (!response.ok || typeof data.billedHours !== 'number') {
+            setRoute(null)
+            setRouteState('error')
+            setRouteError(data.error || 'The route could not be calculated just now.')
+            return
+          }
+          setRoute({
+            miles: data.miles ?? 0,
+            minutes: data.minutes ?? 0,
+            billedHours: data.billedHours,
+            traffic: Boolean(data.traffic),
+          })
+          setRouteState('ready')
+          setRouteError('')
+        })
+        .catch(() => {
+          if (controller.signal.aborted) return
+          setRoute(null)
+          setRouteState('error')
+          setRouteError('The route could not be calculated just now.')
+        })
+    }, 250)
+
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [tripType, pickupPlaceId, dropoffPlaceId, date, time])
 
   const goNext = (event: FormEvent) => {
     event.preventDefault()
@@ -74,7 +141,12 @@ function Book() {
         returning: returning ? 'Yes' : 'No',
         vehicle: vehicle?.name ?? '',
         quote: selectedQuote?.amount != null ? formatPrice(selectedQuote.amount) : '',
-        summary: selectedQuote?.summary ?? '',
+        summary: [
+          route && tripType === 'one-way' ? `${route.miles} miles, about ${route.minutes} minutes, charged as ${route.billedHours} hours` : '',
+          selectedQuote?.summary ?? '',
+        ]
+          .filter(Boolean)
+          .join('. '),
         website,
       })
       setSubmitted(true)
@@ -150,28 +222,32 @@ function Book() {
                     </label>
                   ) : null}
 
-                  <label className="block text-sm font-medium">
-                    {tripType === 'airport' ? 'Pickup or drop-off address' : 'Pickup Address'}
-                    <input
-                      required
-                      value={pickup}
-                      onChange={(event) => setPickup(event.target.value)}
-                      placeholder="Address, airport, hotel..."
-                      className={`${fieldClass} mt-1`}
-                    />
-                  </label>
+                  <AddressField
+                    label={tripType === 'airport' ? 'Pickup or drop-off address' : 'Pickup Address'}
+                    value={pickup}
+                    placeId={pickupPlaceId}
+                    required
+                    placeholder="Address, airport, hotel..."
+                    className={fieldClass}
+                    onChange={(text, id) => {
+                      setPickup(text)
+                      setPickupPlaceId(id)
+                    }}
+                  />
 
                   {tripType !== 'hourly' && (
-                    <label className="block text-sm font-medium">
-                      Dropoff Address
-                      <input
-                        required={tripType === 'one-way'}
-                        value={dropoff}
-                        onChange={(event) => setDropoff(event.target.value)}
-                        placeholder="Address, airport, hotel..."
-                        className={`${fieldClass} mt-1`}
-                      />
-                    </label>
+                    <AddressField
+                      label="Dropoff Address"
+                      value={dropoff}
+                      placeId={dropoffPlaceId}
+                      required={tripType === 'one-way'}
+                      placeholder="Address, airport, hotel..."
+                      className={fieldClass}
+                      onChange={(text, id) => {
+                        setDropoff(text)
+                        setDropoffPlaceId(id)
+                      }}
+                    />
                   )}
 
                   <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
@@ -208,6 +284,37 @@ function Book() {
                     <span className="text-lg leading-none">+</span>
                     {returning ? 'Return booking added' : 'Add Return Booking'}
                   </button>
+
+                  {tripType === 'one-way' && (routeState === 'loading' || route || routeError) && (
+                    <div className="rounded-xl border border-white/15 bg-black/40 p-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-primary">Estimated fare</p>
+                      {routeState === 'loading' && <p className="mt-2 text-sm text-white/70">Checking the route…</p>}
+                      {routeState === 'error' && <p className="mt-2 text-sm text-white/70">{routeError}</p>}
+                      {route && (
+                        <>
+                          <p className="mt-2 text-sm text-white/75">
+                            {route.miles} miles, about {route.minutes} minutes{route.traffic ? ' with traffic' : ''}. Charged as {route.billedHours}{' '}
+                            hours.
+                            {returning ? ' A return doubles the fare.' : ''}
+                          </p>
+                          <ul className="mt-3 divide-y divide-white/10">
+                            {vehicles.map((vehicle) => {
+                              const quote = journeyPrice({ ...quoteOptions, vehicleId: vehicle.id })
+                              return (
+                                <li key={vehicle.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+                                  <span>{vehicle.name}</span>
+                                  <span className="font-semibold text-brand-primary">
+                                    {quote?.amount != null ? formatPrice(quote.amount) : 'Quote'}
+                                  </span>
+                                </li>
+                              )
+                            })}
+                          </ul>
+                          <p className="mt-2 text-xs text-white/45">These rates are temporary. The team confirms the fare before you travel.</p>
+                        </>
+                      )}
+                    </div>
+                  )}
 
                   <button
                     type="submit"

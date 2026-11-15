@@ -56,12 +56,56 @@ function enquiryDevApi(): Plugin {
   }
 }
 
+function quoteDevApi(): Plugin {
+  return {
+    name: 'quote-dev-api',
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url?.split('?')[0] !== '/api/quote') {
+          next()
+          return
+        }
+
+        if (req.method !== 'POST') {
+          res.statusCode = 405
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ error: 'Method not allowed' }))
+          return
+        }
+
+        try {
+          const raw = await readBody(req)
+          if (raw.length > 8_000) {
+            res.statusCode = 413
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: 'Request is too long.' }))
+            return
+          }
+          const loaded = (await server.ssrLoadModule('/api/quote.ts')) as {
+            deliverQuote: (input: unknown) => Promise<{ status: number; body: unknown }>
+          }
+          const result = await loaded.deliverQuote(JSON.parse(raw) as unknown)
+          res.statusCode = result.status
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify(result.body))
+        } catch (error) {
+          console.error(error)
+          res.statusCode = 500
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ error: 'The route could not be calculated just now.' }))
+        }
+      })
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   if (env.RESEND_API_KEY) process.env.RESEND_API_KEY = env.RESEND_API_KEY
+  if (env.GOOGLE_MAPS_API_KEY) process.env.GOOGLE_MAPS_API_KEY = env.GOOGLE_MAPS_API_KEY
 
   return {
-    plugins: [react(), enquiryDevApi()],
+    plugins: [react(), enquiryDevApi(), quoteDevApi()],
   }
 })
 
