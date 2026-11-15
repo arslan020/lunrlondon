@@ -31,7 +31,6 @@ function Home() {
         highlight={home.heroHighlight}
         subtext={home.heroSubtext}
         video={home.heroVideo || undefined}
-        image={home.heroImage}
         videoClassName="brightness-[1.18]"
         scrim="soft"
       />

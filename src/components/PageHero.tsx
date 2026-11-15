@@ -62,8 +62,9 @@ function PageHero({
         <video
           className={`absolute inset-0 h-full w-full object-cover ${videoClassName}`}
           src={video}
-          poster={image || '/images/hero.jpg'}
+          poster={image || undefined}
           autoPlay
+          preload="auto"
           muted
           loop
           playsInline
