@@ -231,17 +231,6 @@ function Dashboard() {
       services: content.services.map((item) => (item.slug === service.slug ? { ...item, sections } : item)),
     }
   }
-  const removeServiceSection = async (sectionIndex: number) => {
-    if (!service) return
-    const section = service.sections[sectionIndex]
-    if (!section) return
-    const nextStash = [...stashedSections, { id: `${service.slug}-${Date.now()}-${sectionIndex}`, slug: service.slug, index: sectionIndex, section }]
-    setStashedSections(nextStash)
-    writeStashedSections(nextStash)
-    const next = replaceServiceSections(service.sections.filter((_, index) => index !== sectionIndex))
-    setContent(next)
-    await persist(next, 'Section removed. Reset brings it back.')
-  }
   const restoreStashedSection = async (id: string) => {
     if (!service) return
     const stashed = stashedSections.find((item) => item.id === id && item.slug === service.slug)
@@ -417,9 +406,6 @@ function Dashboard() {
                 <MediaField label="Photo" {...bindMedia(`${service.slug}-section-${sectionIndex}`, section.image ?? '', imageAccept, DEFAULT_CONTENT.services.find((item) => item.slug === service.slug)?.sections[sectionIndex]?.image ?? '', (current, url) => ({ ...current, services: current.services.map((item) => item.slug === service.slug ? { ...item, sections: item.sections.map((part, partIndex) => partIndex === sectionIndex ? { ...part, image: url } : part) } : item) }))} />
                 <Field label="Button label" value={section.buttonLabel ?? ''} onChange={(buttonLabel) => updateSection(sectionIndex, { buttonLabel })} />
                 <Field label="Button link" value={section.buttonTo ?? ''} onChange={(buttonTo) => updateSection(sectionIndex, { buttonTo })} />
-                <button type="button" className="text-left text-sm text-red-300" onClick={() => removeServiceSection(sectionIndex)}>
-                  Remove section
-                </button>
               </Section>
             ))}
             {removedForService.map((item) => (
