@@ -61,12 +61,12 @@ function Home() {
       </section>
 
       <div className="py-4 md:py-6">
-        <GoldCtaBar text={home.goldBar} />
+        <GoldCtaBar text={home.goldBar} pinButton />
       </div>
 
       <section className="py-12 md:py-20">
         <div className="mx-auto grid max-w-content items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
-          <div>
+          <div className="order-2 lg:order-1">
             <SectionHeading heading={home.trustHeading} highlight={home.trustHighlight} theme="dark" />
             {home.trustParagraphs.filter((paragraph) => paragraph.trim()).map((paragraph) => (
               <p key={paragraph} className="mt-6 leading-relaxed text-neutral-200 first:mt-6">
@@ -81,14 +81,13 @@ function Home() {
               <Button to="/book">Book With Confidence</Button>
             </div>
           </div>
-          <ImagePlaceholder label={home.trustImageLabel} src={home.trustImage} className="min-h-[240px]" />
+          <ImagePlaceholder label={home.trustImageLabel} src={home.trustImage} className="order-1 min-h-[240px] lg:order-2" />
         </div>
       </section>
 
       <section className="py-8 md:py-16">
         <div className="mx-auto grid max-w-content items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
-          <ImagePlaceholder label="Range Rover" src={home.respectImage} className="order-1 min-h-[240px] lg:order-1" />
-          <div className="order-2">
+          <div className="order-1 lg:order-2">
             <SectionHeading heading={home.respectHeading} highlight={home.respectHighlight} theme="dark" />
             {home.respectParagraphs.filter((paragraph) => paragraph.trim()).map((paragraph) => (
               <p key={paragraph} className="mt-6 leading-relaxed text-neutral-200">
@@ -96,6 +95,7 @@ function Home() {
               </p>
             ))}
           </div>
+          <ImagePlaceholder label="Range Rover" src={home.respectImage} className="order-2 min-h-[240px] lg:order-1" />
         </div>
       </section>
 
