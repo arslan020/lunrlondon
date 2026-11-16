@@ -61,7 +61,7 @@ function Home() {
       </section>
 
       <div className="py-4 md:py-6">
-        <GoldCtaBar text={home.goldBar} pinButton />
+        <GoldCtaBar text={home.goldBar} />
       </div>
 
       <section className="py-12 md:py-20">
