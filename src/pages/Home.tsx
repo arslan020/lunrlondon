@@ -42,29 +42,6 @@ function Home() {
       </section>
 
       <section className="py-12 md:py-20">
-        <div className="mx-auto grid max-w-content items-start gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16">
-          <h2 className="font-serif text-[clamp(2rem,1.4rem+2.2vw,3rem)] font-medium leading-tight text-white">
-            {goldHeading(home.luxuryHeading, home.luxuryHighlight)}
-          </h2>
-          <div>
-            {paragraphs.map((paragraph) => (
-              <p key={paragraph} className="mt-5 leading-relaxed text-neutral-200 first:mt-0">
-                {paragraph}
-              </p>
-            ))}
-            <p className="mt-5 font-serif text-xl text-brand-primary">{home.luxurySignoff}</p>
-            <div className="mt-8">
-              <Button to="/contact">Enquire Today</Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="py-4 md:py-6">
-        <GoldCtaBar text={home.goldBar} />
-      </div>
-
-      <section className="py-12 md:py-20">
         <div className="mx-auto grid max-w-content items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
           <div className="order-2 lg:order-1">
             <SectionHeading heading={home.trustHeading} highlight={home.trustHighlight} theme="dark" />
@@ -98,6 +75,29 @@ function Home() {
           <ImagePlaceholder label="Range Rover" src={home.respectImage} className="order-2 min-h-[240px] lg:order-1" />
         </div>
       </section>
+
+      <section className="py-12 md:py-20">
+        <div className="mx-auto grid max-w-content items-start gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16">
+          <h2 className="font-serif text-[clamp(2rem,1.4rem+2.2vw,3rem)] font-medium leading-tight text-white">
+            {goldHeading(home.luxuryHeading, home.luxuryHighlight)}
+          </h2>
+          <div>
+            {paragraphs.map((paragraph) => (
+              <p key={paragraph} className="mt-5 leading-relaxed text-neutral-200 first:mt-0">
+                {paragraph}
+              </p>
+            ))}
+            <p className="mt-5 font-serif text-xl text-brand-primary">{home.luxurySignoff}</p>
+            <div className="mt-8">
+              <Button to="/contact">Enquire Today</Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="py-4 md:py-6">
+        <GoldCtaBar text={home.goldBar} />
+      </div>
 
       <section className="py-12 md:py-20">
         <div className="mx-auto grid max-w-content gap-10 px-4 sm:px-6 lg:grid-cols-3 lg:gap-12">
