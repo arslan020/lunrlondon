@@ -1,5 +1,5 @@
 export type TripType = 'one-way' | 'airport' | 'hourly'
-export type VehicleId = 'e-class' | 'v-class' | 'range-rover' | 's-class'
+export type VehicleId = 'e-class' | 'v-class' | 'range-rover' | 's-class' | '5-series'
 
 export interface Vehicle {
   id: VehicleId
@@ -35,7 +35,7 @@ export const vehicles: Vehicle[] = [
   },
   {
     id: 'range-rover',
-    name: 'Range Rover',
+    name: 'Land Rover Range Rover',
     shortName: 'Range Rover',
     hourly: 100,
     seats: 'Up to 4 passengers',
@@ -48,6 +48,14 @@ export const vehicles: Vehicle[] = [
     hourly: 75,
     seats: 'Up to 3 passengers',
     image: '/images/s-class-night.jpg',
+  },
+  {
+    id: '5-series',
+    name: 'BMW 5 Series',
+    shortName: '5 Series',
+    hourly: 50,
+    seats: 'Up to 3 passengers',
+    image: '/images/5-series-night.jpg',
   },
 ]
 
@@ -62,7 +70,18 @@ export const airports: AirportFare[] = [
 
 export const minimumHours = 2
 
-export const formatPrice = (amount: number) => `£${amount}`
+export const meterRates: Partial<Record<VehicleId, { perMinute: number; perMile: number }>> = {
+  'e-class': { perMinute: 1, perMile: 1.6 },
+  'v-class': { perMinute: 1.4, perMile: 2.2 },
+  'range-rover': { perMinute: 2, perMile: 3.2 },
+  's-class': { perMinute: 1.5, perMile: 2.4 },
+  '5-series': { perMinute: 1, perMile: 1.6 },
+}
+
+export const formatPrice = (amount: number) => {
+  const rounded = Math.round(amount * 100) / 100
+  return Number.isInteger(rounded) ? `£${rounded}` : `£${rounded.toFixed(2)}`
+}
 
 export type PriceCatalog = {
   vehicles?: Vehicle[]
@@ -72,6 +91,21 @@ export type PriceCatalog = {
 
 export function airportById(id: string, list: AirportFare[] = airports) {
   return list.find((airport) => airport.id === id)
+}
+
+const vehicleBrands: Record<VehicleId, string> = {
+  'e-class': 'Mercedes-Benz',
+  'v-class': 'Mercedes-Benz',
+  'range-rover': 'Land Rover',
+  's-class': 'Mercedes-Benz',
+  '5-series': 'BMW',
+}
+
+export function vehicleTitle(vehicle: { id: VehicleId; name: string; shortName: string }) {
+  const brand = vehicleBrands[vehicle.id]
+  const model = vehicle.shortName.trim() || vehicle.name.trim()
+  if (!brand || model.toLowerCase().startsWith(brand.toLowerCase())) return model || vehicle.name
+  return `${brand} ${model}`
 }
 
 export function vehicleById(id: VehicleId, list: Vehicle[] = vehicles) {
@@ -94,6 +128,8 @@ export function journeyPrice(options: {
   dropoff: string
   returning: boolean
   chargedHours?: number
+  miles?: number
+  minutes?: number
 }, catalog: PriceCatalog = {}) {
   const vehicleList = catalog.vehicles ?? vehicles
   const airportList = catalog.airports ?? airports
@@ -102,6 +138,9 @@ export function journeyPrice(options: {
   if (!vehicle) return null
 
   if (options.tripType === 'hourly') {
+    if (!vehicle.hourly) {
+      return { amount: null, summary: `The ${vehicle.shortName} hourly fare is confirmed when you enquire.` }
+    }
     const hours = Math.max(options.hours || minimum, minimum)
     const amount = vehicle.hourly * hours * (options.returning ? 2 : 1)
     return {
@@ -115,19 +154,37 @@ export function journeyPrice(options: {
       ? airportById(options.airportId, airportList)
       : matchAirport(`${options.pickup} ${options.dropoff}`, airportList)
 
+  const meter = meterRates[options.vehicleId]
+  const canMeter = Boolean(meter && options.miles != null && options.minutes != null && options.miles >= 0 && options.minutes > 0)
+
   if (airport) {
     const fare = airport.prices[options.vehicleId]
-    if (fare == null) {
+    if (fare != null) {
+      const amount = options.returning ? fare * 2 : fare
+      return {
+        amount,
+        summary: `${airport.name} fixed fare${options.returning ? ', including the return journey' : ''}`,
+      }
+    }
+    if (!canMeter) {
       return {
         amount: null,
         summary: `${airport.name} in a ${vehicle.shortName} is confirmed when you enquire.`,
       }
     }
-    const amount = options.returning ? fare * 2 : fare
+  }
+
+  if (meter && canMeter) {
+    const oneWay = Math.round((options.minutes * meter.perMinute + options.miles * meter.perMile) * 100) / 100
+    const amount = options.returning ? Math.round(oneWay * 2 * 100) / 100 : oneWay
     return {
       amount,
-      summary: `${airport.name} fixed fare${options.returning ? ', including the return journey' : ''}`,
+      summary: `${options.minutes} min × ${formatPrice(meter.perMinute)} + ${options.miles} mi × ${formatPrice(meter.perMile)}${options.returning ? ', including the return' : ''}`,
     }
+  }
+
+  if (!vehicle.hourly) {
+    return { amount: null, summary: `The ${vehicle.shortName} fare is confirmed when you enquire.` }
   }
 
   const hours =

@@ -4,6 +4,8 @@ import { useContent } from '../content/ContentProvider'
 import {
   formatPrice,
   journeyPrice,
+  meterRates,
+  vehicleTitle,
   type TripType,
   type VehicleId,
 } from '../data/pricing'
@@ -49,11 +51,21 @@ function Book() {
 
   const selectedAirport = airports.find((airport) => airport.id === airportId)
   const chargedHours = tripType === 'one-way' && route ? route.billedHours : undefined
-  const quoteOptions = { tripType, hours, airportId, pickup, dropoff, returning, chargedHours }
+  const quoteOptions = {
+    tripType,
+    hours,
+    airportId,
+    pickup,
+    dropoff,
+    returning,
+    chargedHours,
+    miles: route?.miles,
+    minutes: route?.minutes,
+  }
 
   const selectedQuote = useMemo(
     () => journeyPrice({ ...quoteOptions, vehicleId }, catalog),
-    [tripType, hours, airportId, pickup, dropoff, returning, vehicleId, chargedHours, vehicles, airports, minimumHours],
+    [tripType, hours, airportId, pickup, dropoff, returning, vehicleId, chargedHours, route?.miles, route?.minutes, vehicles, airports, minimumHours],
   )
 
   useEffect(() => {
@@ -151,10 +163,10 @@ function Book() {
         hours: tripType === 'hourly' ? String(hours) : '',
         returning: returning ? 'Yes' : 'No',
         returnAddress: returning ? returnAddress : '',
-        vehicle: vehicle?.name ?? '',
+        vehicle: vehicle ? vehicleTitle(vehicle) : '',
         quote: selectedQuote?.amount != null ? formatPrice(selectedQuote.amount) : '',
         summary: [
-          route && tripType !== 'hourly' ? `${route.miles} miles, about ${route.minutes} minutes${tripType === 'one-way' ? `, charged as ${route.billedHours} hours` : ''}` : '',
+          route && tripType !== 'hourly' ? `${route.miles} miles, about ${route.minutes} minutes${tripType === 'one-way' && !meterRates[vehicleId] ? `, charged as ${route.billedHours} hours` : ''}` : '',
           selectedQuote?.summary ?? '',
         ]
           .filter(Boolean)
@@ -320,9 +332,7 @@ function Book() {
                       {tripType !== 'hourly' && routeState === 'error' && <p className="mt-2 text-sm text-white/70">{routeError}</p>}
                       {tripType !== 'hourly' && route && (
                         <p className="mt-2 text-sm text-white/75">
-                          {route.miles} miles, about {route.minutes} minutes{route.traffic ? ' with traffic' : ''}.
-                          {tripType === 'one-way' ? ` Charged as ${route.billedHours} hours.` : ' Fixed airport fare.'}
-                          {returning ? ' A return doubles the fare.' : ''}
+                          {route.miles} miles, about {route.minutes} minutes.
                         </p>
                       )}
                       {tripType === 'hourly' && (
@@ -341,7 +351,7 @@ function Book() {
                           const quote = journeyPrice({ ...quoteOptions, vehicleId: vehicle.id }, catalog)
                           return (
                             <li key={vehicle.id} className="flex items-center justify-between gap-3 py-2 text-sm">
-                              <span>{vehicle.name}</span>
+                              <span>{vehicleTitle(vehicle)}</span>
                               <span className="font-semibold text-brand-primary">
                                 {quote?.amount != null ? formatPrice(quote.amount) : 'Quote'}
                               </span>
@@ -376,14 +386,16 @@ function Book() {
                           }`}
                         >
                           {vehicle.image ? (
-                            <img src={vehicle.image} alt="" className="h-14 w-16 shrink-0 rounded-lg bg-neutral-200 object-contain sm:h-16 sm:w-20" />
+                            <span className="h-14 w-[6.25rem] shrink-0 overflow-hidden rounded-lg bg-black sm:h-16 sm:w-28">
+                              <img src={vehicle.image} alt="" className="h-full w-full object-contain" />
+                            </span>
                           ) : (
-                            <span className="h-14 w-16 shrink-0 rounded-lg bg-neutral-200 sm:h-16 sm:w-20" />
+                            <span className="h-14 w-[6.25rem] shrink-0 rounded-lg bg-black sm:h-16 sm:w-28" />
                           )}
                           <span className="min-w-0 flex-1">
-                            <span className="block font-semibold">{vehicle.shortName}</span>
+                            <span className="block font-semibold">{vehicleTitle(vehicle)}</span>
                             <span className="block text-xs text-white/50">
-                              {vehicle.seats} · {formatPrice(vehicle.hourly)}/hour
+                              {vehicle.seats} · {tripType === 'one-way' && meterRates[vehicle.id] ? `${formatPrice(meterRates[vehicle.id]!.perMinute)}/min · ${formatPrice(meterRates[vehicle.id]!.perMile)}/mi` : vehicle.hourly > 0 ? `${formatPrice(vehicle.hourly)}/hour` : 'Fare on enquiry'}
                             </span>
                           </span>
                           <span className="shrink-0 font-serif text-xl text-brand-primary sm:text-2xl">{quote?.amount != null ? formatPrice(quote.amount) : 'Quote'}</span>
@@ -432,15 +444,15 @@ function Book() {
         <aside className="min-w-0 rounded-2xl border border-white/20 bg-black/35 p-5 text-white backdrop-blur-md sm:p-6">
           <h2 className="font-serif text-3xl">Price list</h2>
           <p className="mt-2 text-sm leading-relaxed text-neutral-400">
-            Hourly hire is charged per hour. Airport fares are fixed from central London. A return booking doubles the fare. We accept cryptocurrency.
+            Hourly hire is charged per hour. An E-Class one-way journey is {formatPrice(meterRates['e-class']!.perMinute)} per minute plus {formatPrice(meterRates['e-class']!.perMile)} per mile. A V-Class one-way journey is {formatPrice(meterRates['v-class']!.perMinute)} per minute plus {formatPrice(meterRates['v-class']!.perMile)} per mile. A Range Rover one-way journey is {formatPrice(meterRates['range-rover']!.perMinute)} per minute plus {formatPrice(meterRates['range-rover']!.perMile)} per mile. An S-Class one-way journey is {formatPrice(meterRates['s-class']!.perMinute)} per minute plus {formatPrice(meterRates['s-class']!.perMile)} per mile. A 5 Series one-way journey is {formatPrice(meterRates['5-series']!.perMinute)} per minute plus {formatPrice(meterRates['5-series']!.perMile)} per mile. Airport fares are fixed from central London. A return booking doubles the fare. We accept cryptocurrency.
           </p>
 
           <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-brand-primary">Per hour</h3>
           <ul className="mt-3 divide-y divide-white/10">
             {vehicles.map((vehicle) => (
               <li key={vehicle.id} className="flex items-center justify-between gap-3 py-3 text-sm">
-                <span>{vehicle.shortName}</span>
-                <span className="font-semibold text-brand-primary">{formatPrice(vehicle.hourly)} / hour</span>
+                <span>{vehicleTitle(vehicle)}</span>
+                <span className="font-semibold text-brand-primary">{vehicle.hourly > 0 ? `${formatPrice(vehicle.hourly)} / hour` : 'On enquiry'}</span>
               </li>
             ))}
           </ul>
@@ -453,7 +465,7 @@ function Book() {
                 <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
                   {vehicles.map((vehicle) => (
                     <div key={vehicle.id} className="flex min-w-0 items-baseline justify-between gap-2">
-                      <dt className="truncate text-neutral-400">{vehicle.shortName}</dt>
+                      <dt className="truncate text-neutral-400">{vehicleTitle(vehicle)}</dt>
                       <dd className="shrink-0 font-semibold">{fareCell(airport.prices[vehicle.id])}</dd>
                     </div>
                   ))}
@@ -466,20 +478,18 @@ function Book() {
               <thead className="text-xs uppercase tracking-wide text-neutral-400">
                 <tr>
                   <th className="py-2 pr-3 font-medium">Airport</th>
-                  <th className="py-2 pr-3 font-medium">E-Class</th>
-                  <th className="py-2 pr-3 font-medium">V-Class</th>
-                  <th className="py-2 pr-3 font-medium">Range Rover</th>
-                  <th className="py-2 font-medium">S-Class</th>
+                  {vehicles.map((vehicle) => (
+                    <th key={vehicle.id} className="py-2 pr-3 font-medium">{vehicleTitle(vehicle)}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {airports.map((airport) => (
                   <tr key={airport.id} className="border-t border-white/10">
                     <td className="py-2.5 pr-3">{airport.name}</td>
-                    <td className="py-2.5 pr-3">{fareCell(airport.prices['e-class'])}</td>
-                    <td className="py-2.5 pr-3">{fareCell(airport.prices['v-class'])}</td>
-                    <td className="py-2.5 pr-3">{fareCell(airport.prices['range-rover'])}</td>
-                    <td className="py-2.5">{fareCell(airport.prices['s-class'])}</td>
+                    {vehicles.map((vehicle) => (
+                      <td key={vehicle.id} className="py-2.5 pr-3">{fareCell(airport.prices[vehicle.id])}</td>
+                    ))}
                   </tr>
                 ))}
               </tbody>

@@ -64,7 +64,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     reviewsText: 'From airport transfers to special occasions, our clients trust us for a smooth, professional service every step of the way.',
     fleetHeading: 'A Fleet Designed for Comfort & Flexibility',
     fleetHighlight: 'Designed',
-    fleetText: `The ${siteConfig.brandName} fleet is the Mercedes-Benz E-Class, V-Class and S-Class, and the Range Rover. All vehicles are:`,
+    fleetText: `The ${siteConfig.brandName} fleet is the Mercedes-Benz E-Class, V-Class and S-Class, the BMW 5 Series, and the Range Rover. All vehicles are:`,
     fleetBullets: [
       'Immaculately cleaned before every journey',
       'Regularly maintained and safety checked',
@@ -93,7 +93,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     image: '/images/fleet-night.jpg',
     video: '',
     introHeading: 'Select the Right Vehicle for Your Journey',
-    introText: 'Choose an E-Class, V-Class, S-Class, or Range Rover. Hourly hire is priced per hour, and airport journeys use the fixed fares on the booking page.',
+    introText: 'Choose an E-Class, V-Class, S-Class, BMW 5 Series, or Range Rover. Hourly hire is priced per hour, and airport journeys use the fixed fares on the booking page.',
     closingHeading: 'Need Help Choosing a Vehicle?',
     closingText: 'Tell us about your journey and we will recommend the right vehicle or provide a quote.',
   },
