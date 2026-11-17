@@ -155,7 +155,9 @@ export function journeyPrice(options: {
       : matchAirport(`${options.pickup} ${options.dropoff}`, airportList)
 
   const meter = meterRates[options.vehicleId]
-  const canMeter = Boolean(meter && options.miles != null && options.minutes != null && options.miles >= 0 && options.minutes > 0)
+  const miles = options.miles
+  const minutes = options.minutes
+  const canMeter = Boolean(meter && miles != null && minutes != null && miles >= 0 && minutes > 0)
 
   if (airport) {
     const fare = airport.prices[options.vehicleId]
@@ -174,12 +176,12 @@ export function journeyPrice(options: {
     }
   }
 
-  if (meter && canMeter) {
-    const oneWay = Math.round((options.minutes * meter.perMinute + options.miles * meter.perMile) * 100) / 100
+  if (meter && miles != null && minutes != null && miles >= 0 && minutes > 0) {
+    const oneWay = Math.round((minutes * meter.perMinute + miles * meter.perMile) * 100) / 100
     const amount = options.returning ? Math.round(oneWay * 2 * 100) / 100 : oneWay
     return {
       amount,
-      summary: `${options.minutes} min × ${formatPrice(meter.perMinute)} + ${options.miles} mi × ${formatPrice(meter.perMile)}${options.returning ? ', including the return' : ''}`,
+      summary: `${minutes} min × ${formatPrice(meter.perMinute)} + ${miles} mi × ${formatPrice(meter.perMile)}${options.returning ? ', including the return' : ''}`,
     }
   }
 
