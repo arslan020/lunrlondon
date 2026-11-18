@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import PageHero from '../components/PageHero'
 import SectionHeading from '../components/SectionHeading'
 import CTASection from '../components/CTASection'
 import Button from '../components/Button'
@@ -16,19 +15,42 @@ const cardImagePosition: Record<VehicleId, string> = {
 
 function OurLuxuryFleet() {
   const { fleet, vehicles } = useContent()
+  const heading = fleet.heading
+  const highlight = fleet.highlight
+  const renderedHeading =
+    highlight && heading.includes(highlight) ? (
+      <>
+        {heading.split(highlight)[0]}
+        <em className="font-serif italic text-brand-primary">{highlight}</em>
+        {heading.split(highlight)[1]}
+      </>
+    ) : (
+      heading
+    )
+
   return (
     <>
-      <PageHero
-        heading={fleet.heading}
-        highlight={fleet.highlight}
-        subtext={fleet.subtext}
-        buttonLabel="Choose Your Vehicle"
-        buttonTo="/book"
-        image={fleet.image}
-        video={fleet.video || undefined}
-        imageFit={fleet.video ? 'cover' : 'natural'}
-        scrim="soft"
-      />
+      <section className="relative bg-[#080808]">
+        <picture>
+          <source media="(max-width: 768px)" srcSet="/images/lunr-fleet-mobile.jpg" />
+          <img
+            src="/images/lunr-fleet-hero.jpg"
+            alt="LUNR luxury chauffeur fleet"
+            className="block h-auto w-full object-contain"
+          />
+        </picture>
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent">
+          <div className="mx-auto max-w-content px-4 pb-10 pt-28 sm:px-6 sm:pb-14">
+            <h1 className="max-w-2xl font-serif text-[clamp(2.05rem,1.4rem+2.6vw,3rem)] font-medium leading-[1.1] text-white">
+              {renderedHeading}
+            </h1>
+            <p className="mt-5 max-w-xl text-sm leading-relaxed text-neutral-200 sm:text-base">{fleet.subtext}</p>
+            <div className="mt-7">
+              <Button to="/book">Choose Your Vehicle</Button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="py-12 md:py-20">
         <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">

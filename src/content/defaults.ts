@@ -90,7 +90,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     heading: 'Our Luxury Fleet',
     highlight: 'Luxury',
     subtext: 'Our vehicles are chosen for comfort, refinement, and reliability. Every journey is presented in a meticulously prepared car, driven by a licensed chauffeur.',
-    image: '/images/fleet-night.jpg',
+    image: '/images/lunr-fleet-hero.jpg',
     video: '',
     introHeading: 'Select the Right Vehicle for Your Journey',
     introText: 'Choose an E-Class, V-Class, S-Class, BMW 5 Series, or Range Rover. Hourly hire is priced per hour, and airport journeys use the fixed fares on the booking page.',
