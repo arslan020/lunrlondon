@@ -10,8 +10,9 @@ function hasId(item: unknown): item is { id: string } {
 }
 
 export function mergeContent(overlay: unknown): SiteContent {
-  if (!isPlainObject(overlay)) return structuredClone(DEFAULT_CONTENT)
-  return structuredClone(deepMerge(DEFAULT_CONTENT, overlay))
+  const merged = !isPlainObject(overlay) ? structuredClone(DEFAULT_CONTENT) : structuredClone(deepMerge(DEFAULT_CONTENT, overlay))
+  if (!merged.minimumHours || merged.minimumHours < 4) merged.minimumHours = 4
+  return merged
 }
 
 function deepMerge<T>(base: T, overlay: unknown): T {

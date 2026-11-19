@@ -451,7 +451,7 @@ function Dashboard() {
 
         {tab === 'Prices' && (
           <Section title="Prices">
-            <Field label="Minimum hours" value={String(content.minimumHours)} onChange={(value) => setContent({ ...content, minimumHours: Number(value) || 2 })} />
+            <Field label="Minimum hours" value={String(content.minimumHours)} onChange={(value) => setContent({ ...content, minimumHours: Math.max(4, Number(value) || 4) })} />
             {content.vehicles.map((vehicle, index) => (
               <div key={vehicle.id} className="grid gap-3 rounded-xl border border-white/10 p-3">
                 <Field label="Name" value={vehicle.name} onChange={(name) => setContent({ ...content, vehicles: content.vehicles.map((item, itemIndex) => itemIndex === index ? { ...item, name } : item) })} />
