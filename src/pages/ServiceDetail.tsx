@@ -6,8 +6,23 @@ import CTASection from '../components/CTASection'
 import GoldCtaBar from '../components/GoldCtaBar'
 import Button from '../components/Button'
 import UKMapGraphic from '../components/UKMapGraphic'
+import TermsNote from '../components/TermsNote'
 import { useContent } from '../content/ContentProvider'
+import { airportTerms, hourlyTerms, oneWayTerms } from '../data/pricing'
 import type { ServiceFeatureSection } from '../types'
+
+function termsFor(slug: string, minimumHours: number) {
+  if (slug === 'as-directed') return hourlyTerms(minimumHours)
+  if (slug === 'one-way-transfer') return oneWayTerms
+  if (slug === 'airport-transfer') return airportTerms
+  return 'Quoted from the brief before you travel. Cancel free up to 24 hours before pickup.'
+}
+
+function currentCopy(text: string, minimumHours: number) {
+  return text
+    .replaceAll('The minimum booking is two hours. ', `The minimum booking is ${minimumHours} hours. `)
+    .replaceAll('with a two-hour minimum, and confirmed against the route before you travel.', 'from the minutes and miles, and confirmed before you travel.')
+}
 
 function headingWithHighlight(heading: string, highlight?: string) {
   if (!highlight || !heading.includes(highlight)) return heading
@@ -21,7 +36,7 @@ function headingWithHighlight(heading: string, highlight?: string) {
   )
 }
 
-function GoldPanel({ section }: { section: ServiceFeatureSection }) {
+function GoldPanel({ section, terms }: { section: ServiceFeatureSection; terms: string }) {
   return (
     <section className="no-reveal py-6 md:py-8">
       <div className="mx-auto max-w-content px-4 sm:px-6">
@@ -53,6 +68,9 @@ function GoldPanel({ section }: { section: ServiceFeatureSection }) {
                 </Button>
               </div>
             )}
+            <div className="mt-6">
+              <TermsNote tone="dark">{terms}</TermsNote>
+            </div>
           </div>
         </div>
       </div>
@@ -62,8 +80,9 @@ function GoldPanel({ section }: { section: ServiceFeatureSection }) {
 
 function ServiceDetail() {
   const { slug } = useParams<{ slug: string }>()
-  const { services } = useContent()
+  const { services, minimumHours } = useContent()
   const service = slug ? services.find((item) => item.slug === slug) : undefined
+  const terms = service ? termsFor(service.slug, minimumHours) : ''
 
   if (!service) {
     return <Navigate to="/chauffeur-services" replace />
@@ -91,12 +110,15 @@ function ServiceDetail() {
                   buttonLabel={section.buttonLabel}
                   buttonTo={section.buttonTo}
                 />
+                <div className="mx-auto mt-4 max-w-content px-4 sm:px-6">
+                  <TermsNote>{terms}</TermsNote>
+                </div>
               </section>
             )
           }
 
           if (section.layout === 'gold') {
-            return <GoldPanel key={section.heading} section={section} />
+            return <GoldPanel key={section.heading} section={section} terms={terms} />
           }
 
           return (
@@ -106,7 +128,7 @@ function ServiceDetail() {
                   <SectionHeading heading={section.heading} highlight={section.highlight} />
                   {section.paragraphs.map((paragraph) => (
                     <p key={paragraph} className="mt-5 leading-relaxed text-neutral-200">
-                      {paragraph}
+                      {currentCopy(paragraph, minimumHours)}
                     </p>
                   ))}
                   {section.bullets && (
@@ -134,6 +156,9 @@ function ServiceDetail() {
                     className={`order-1 min-h-[220px] ${section.imageFirst ? '' : 'lg:order-2'}`}
                   />
                 )}
+              </div>
+              <div className="mx-auto max-w-content px-4 pb-8 sm:px-6">
+                <TermsNote>{terms}</TermsNote>
               </div>
             </section>
           )

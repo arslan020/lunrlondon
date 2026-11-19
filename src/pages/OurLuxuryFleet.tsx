@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom'
 import SectionHeading from '../components/SectionHeading'
 import CTASection from '../components/CTASection'
 import Button from '../components/Button'
-import { formatPrice, vehicleTitle, type VehicleId } from '../data/pricing'
+import TermsNote from '../components/TermsNote'
+import { formatPrice, hourlyTerms, vehicleTitle, type VehicleId } from '../data/pricing'
 import { useContent } from '../content/ContentProvider'
 
 const cardImagePosition: Record<VehicleId, string> = {
@@ -14,7 +15,7 @@ const cardImagePosition: Record<VehicleId, string> = {
 }
 
 function OurLuxuryFleet() {
-  const { fleet, vehicles } = useContent()
+  const { fleet, vehicles, minimumHours } = useContent()
   const heading = fleet.heading
   const highlight = fleet.highlight
   const renderedHeading =
@@ -94,6 +95,11 @@ function OurLuxuryFleet() {
                 >
                   Book Now
                 </Link>
+                {vehicle.hourly > 0 && (
+                  <div className="mt-4">
+                    <TermsNote>{hourlyTerms(minimumHours)}</TermsNote>
+                  </div>
+                )}
               </div>
             </article>
           ))}

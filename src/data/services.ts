@@ -70,7 +70,7 @@ export const services: ServiceData[] = [
         image: '/images/s-class-ivy.jpg',
         imageFirst: true,
         paragraphs: [
-          'The minimum booking is two hours. You choose how many hours you need, and the congestion charge is included in the rate you confirm. The hourly rates are:',
+          'You choose how many hours you need, and the congestion charge is included in the rate you confirm. The hourly rates are:',
         ],
         bullets: [
           'Mercedes-Benz E-Class, £50 per hour',
@@ -189,7 +189,7 @@ export const services: ServiceData[] = [
         image: '/images/s-class-palace.jpg',
         imageFirst: true,
         paragraphs: [
-          'Airport journeys use the fixed fare for that airport and vehicle. Any other one-way route is priced from the hourly rate, with a two-hour minimum, and confirmed against the route before you travel.',
+          'Airport journeys use the fixed fare for that airport and vehicle. Any other one-way route is priced from the minutes and miles, and confirmed before you travel.',
           'Add a return when you need the same car to collect you later. A return doubles the fare. The from rates are:',
         ],
         bullets: [

@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import AddressField from '../components/AddressField'
+import TermsNote from '../components/TermsNote'
 import { useContent } from '../content/ContentProvider'
 import {
   airportDropoffFee,
+  airportTerms,
   formatPrice,
+  hourlyTerms,
   includedMilesPerHour,
   journeyPrice,
   meterRates,
+  oneWayTerms,
   vehicleTitle,
   type AirportLeg,
   type TripType,
@@ -379,8 +383,8 @@ function Book() {
                       {tripType === 'hourly' && routeState === 'error' && <p className="mt-2 text-sm text-white/70">{routeError}</p>}
                       {tripType === 'hourly' && (
                         <p className="mt-2 text-sm text-white/75">
-                          {Math.max(hours || minimumHours, minimumHours)} hours at the hourly rate. Minimum booking is {minimumHours} hours. {includedMilesPerHour} miles per hour are included.
-                          {route ? ` About ${returning ? Math.round(route.miles * 2 * 10) / 10 : route.miles} miles.` : ''} Further miles are charged at the mileage rate.
+                          {Math.max(hours || minimumHours, minimumHours)} hours at the hourly rate.
+                          {route ? ` About ${returning ? Math.round(route.miles * 2 * 10) / 10 : route.miles} miles.` : ''}
                           {returning ? ' The return journey is included in the mileage.' : ''}
                         </p>
                       )}
@@ -404,6 +408,9 @@ function Book() {
                         })}
                       </ul>
                       <p className="mt-2 text-xs text-white/45">These rates are temporary. The team confirms the fare before you travel.</p>
+                      <div className="mt-3">
+                        <TermsNote>{tripType === 'airport' ? airportTerms : tripType === 'hourly' ? hourlyTerms(minimumHours) : oneWayTerms}</TermsNote>
+                      </div>
                     </div>
                   )}
 
@@ -488,21 +495,26 @@ function Book() {
         <aside className="min-w-0 rounded-2xl border border-white/20 bg-black/35 p-5 text-white backdrop-blur-md sm:p-6">
           <h2 className="font-serif text-3xl">Price list</h2>
           <p className="mt-2 text-sm leading-relaxed text-neutral-400">
-            Hourly hire is charged per hour, with a {minimumHours} hour minimum. {includedMilesPerHour} miles are included in each hour. Miles beyond that are charged at the mileage rate, so a long journey is not covered by the hours alone. An E-Class one-way journey is {formatPrice(meterRates['e-class']!.perMinute)} per minute plus {formatPrice(meterRates['e-class']!.perMile)} per mile. A V-Class one-way journey is {formatPrice(meterRates['v-class']!.perMinute)} per minute plus {formatPrice(meterRates['v-class']!.perMile)} per mile. A Range Rover one-way journey is {formatPrice(meterRates['range-rover']!.perMinute)} per minute plus {formatPrice(meterRates['range-rover']!.perMile)} per mile. An S-Class one-way journey is {formatPrice(meterRates['s-class']!.perMinute)} per minute plus {formatPrice(meterRates['s-class']!.perMile)} per mile. A 5 Series one-way journey is {formatPrice(meterRates['5-series']!.perMinute)} per minute plus {formatPrice(meterRates['5-series']!.perMile)} per mile. Airport prices below are the pickup fare. A drop-off to the airport is {formatPrice(airportDropoffFee)} more. A return is the pickup fare plus the drop-off fare. We accept cryptocurrency.
+            An E-Class one-way journey is {formatPrice(meterRates['e-class']!.perMinute)} per minute plus {formatPrice(meterRates['e-class']!.perMile)} per mile. A V-Class one-way journey is {formatPrice(meterRates['v-class']!.perMinute)} per minute plus {formatPrice(meterRates['v-class']!.perMile)} per mile. A Range Rover one-way journey is {formatPrice(meterRates['range-rover']!.perMinute)} per minute plus {formatPrice(meterRates['range-rover']!.perMile)} per mile. An S-Class one-way journey is {formatPrice(meterRates['s-class']!.perMinute)} per minute plus {formatPrice(meterRates['s-class']!.perMile)} per mile. A 5 Series one-way journey is {formatPrice(meterRates['5-series']!.perMinute)} per minute plus {formatPrice(meterRates['5-series']!.perMile)} per mile. We accept cryptocurrency.
           </p>
+          <div className="mt-3">
+            <TermsNote>{oneWayTerms}</TermsNote>
+          </div>
 
           <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-brand-primary">Per hour</h3>
           <ul className="mt-3 divide-y divide-white/10">
             {vehicles.map((vehicle) => (
               <li key={vehicle.id} className="flex items-center justify-between gap-3 py-3 text-sm">
                 <span>{vehicleTitle(vehicle)}</span>
-                <span className="text-right font-semibold text-brand-primary">{vehicle.hourly > 0 ? `${formatPrice(vehicle.hourly)} / hour` : 'On enquiry'}{vehicle.hourly > 0 ? <span className="mt-0.5 block text-xs font-normal text-neutral-400">{includedMilesPerHour} miles included</span> : null}</span>
+                <span className="font-semibold text-brand-primary">{vehicle.hourly > 0 ? `${formatPrice(vehicle.hourly)} / hour` : 'On enquiry'}</span>
               </li>
             ))}
           </ul>
+          <div className="mt-3">
+            <TermsNote>{hourlyTerms(minimumHours)}</TermsNote>
+          </div>
 
           <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-brand-primary">Airports</h3>
-          <p className="mt-2 text-xs leading-relaxed text-neutral-400">Pickup fare, then drop-off. Drop-off is the pickup fare plus {formatPrice(airportDropoffFee)}.</p>
           <ul className="mt-3 space-y-3 lg:hidden">
             {airports.map((airport) => (
               <li key={airport.id} className="rounded-xl border border-white/10 px-3 py-3">
@@ -523,8 +535,11 @@ function Book() {
                         </dd>
                       </div>
                     )
-                  })}
+                    })}
                 </dl>
+                <div className="mt-3 border-t border-white/10 pt-3">
+                  <TermsNote>{airportTerms}</TermsNote>
+                </div>
               </li>
             ))}
           </ul>
@@ -555,6 +570,9 @@ function Book() {
                 ))}
               </tbody>
             </table>
+            <div className="mt-3">
+              <TermsNote>{airportTerms}</TermsNote>
+            </div>
           </div>
         </aside>
       </div>

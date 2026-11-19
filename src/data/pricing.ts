@@ -89,6 +89,13 @@ export const formatPrice = (amount: number) => {
   return Number.isInteger(rounded) ? `£${rounded}` : `£${rounded.toFixed(2)}`
 }
 
+export const hourlyTerms = (hours = minimumHours) =>
+  `Minimum ${hours} hour booking. ${includedMilesPerHour} miles included per hour. Further miles are charged at the mileage rate.`
+
+export const oneWayTerms = `Charged per minute and per mile. A drop-off to the airport is ${formatPrice(airportDropoffFee)} more than the pickup fare.`
+
+export const airportTerms = `Pickup fare is shown above. Drop-off to the airport is ${formatPrice(airportDropoffFee)} more. A return is the pickup fare plus the drop-off fare.`
+
 export type PriceCatalog = {
   vehicles?: Vehicle[]
   airports?: AirportFare[]
