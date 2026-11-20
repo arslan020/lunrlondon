@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useContent } from '../content/ContentProvider'
+import { destinationRegions } from '../data/destinations'
 
 function Header() {
   const { site: siteConfig, services } = useContent()
+  const location = useLocation()
   const [servicesOpen, setServicesOpen] = useState(false)
+  const [destinationsOpen, setDestinationsOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [menuTop, setMenuTop] = useState(80)
@@ -97,9 +100,47 @@ function Header() {
           <NavLink to="/our-luxury-fleet" className={navLinkClass}>
             Our Fleet
           </NavLink>
-          <NavLink to="/destinations" className={navLinkClass}>
-            Destinations
-          </NavLink>
+          <div
+            className="relative"
+            onMouseEnter={() => setDestinationsOpen(true)}
+            onMouseLeave={() => setDestinationsOpen(false)}
+          >
+            <NavLink
+              to="/destinations"
+              className={`${navLinkClass({ isActive: location.pathname.startsWith('/destinations') })} flex items-center gap-1`}
+            >
+              Destinations
+              <svg viewBox="0 0 12 8" className="h-2 w-2 fill-current">
+                <path d="M6 8 0 0h12z" />
+              </svg>
+            </NavLink>
+            {destinationsOpen && (
+              <div className="absolute left-0 top-full w-64 pt-3">
+                <ul className="rounded-lg border border-white/10 bg-[#141413] py-2 shadow-xl">
+                  <li>
+                    <Link
+                      to="/destinations"
+                      className="block px-4 py-2.5 text-sm font-medium normal-case tracking-normal text-white hover:bg-white/5 hover:text-brand-primary"
+                      onClick={() => setDestinationsOpen(false)}
+                    >
+                      All destinations
+                    </Link>
+                  </li>
+                  {destinationRegions.map((region) => (
+                    <li key={region.slug}>
+                      <Link
+                        to={`/destinations/${region.slug}`}
+                        className="block px-4 py-2.5 text-sm font-medium normal-case tracking-normal text-white hover:bg-white/5 hover:text-brand-primary"
+                        onClick={() => setDestinationsOpen(false)}
+                      >
+                        {region.nav}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
           <NavLink to="/faqs" className={navLinkClass}>
             FAQs
           </NavLink>
@@ -169,6 +210,19 @@ function Header() {
           <Link to="/destinations" onClick={() => setMobileOpen(false)} className="py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white">
             Destinations
           </Link>
+          <ul className="flex flex-col gap-1 border-l border-white/10 pl-4">
+            {destinationRegions.map((region) => (
+              <li key={region.slug}>
+                <Link
+                  to={`/destinations/${region.slug}`}
+                  onClick={() => setMobileOpen(false)}
+                  className="block py-2 text-sm text-neutral-300"
+                >
+                  {region.nav}
+                </Link>
+              </li>
+            ))}
+          </ul>
           <Link to="/faqs" onClick={() => setMobileOpen(false)} className="py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white">
             FAQs
           </Link>

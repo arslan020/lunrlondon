@@ -74,18 +74,25 @@ function Destinations() {
             <p className="mt-6 max-w-3xl leading-relaxed text-neutral-200">
               LUNR meets international arrivals at the airport or their address. The car takes them to London or anywhere in the UK. The fare is confirmed before you travel.
             </p>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2">
-              {destinationRegions.map((item) => (
-                <Link
-                  key={item.slug}
-                  to={`/destinations/${item.slug}`}
-                  className="rounded-[1rem] bg-[#141413] px-5 py-6 transition hover:bg-[#1c1c1b]"
-                >
-                  <h3 className="font-serif text-3xl text-white">{item.nav}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-neutral-300">{item.heading}</p>
-                  <p className="mt-4 text-sm font-semibold text-brand-primary">View cities</p>
-                </Link>
-              ))}
+            <div className="mt-10 grid gap-5 sm:grid-cols-2">
+              {destinationRegions.map((item) => {
+                const image = destinationHero(content, item.slug)
+                return (
+                  <Link
+                    key={item.slug}
+                    to={`/destinations/${item.slug}`}
+                    className="relative flex min-h-[11.5rem] flex-col justify-end overflow-hidden rounded-[1rem] bg-[#141413]"
+                  >
+                    {image && <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover" />}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/15" />
+                    <div className="relative z-10 px-5 py-5">
+                      <h3 className="font-serif text-3xl text-white">{item.nav}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-neutral-200">{item.heading}</p>
+                      <p className="mt-4 text-sm font-semibold text-brand-primary">View cities</p>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           </div>
         </section>
