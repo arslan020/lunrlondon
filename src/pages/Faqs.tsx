@@ -23,7 +23,7 @@ function Faqs() {
               </Link>
             </div>
           </div>
-          <ImagePlaceholder label="Range Rover" src={faqsPage.image} className="min-h-[220px]" />
+          <ImagePlaceholder label="Range Rover" src={faqsPage.image} fit="natural" />
         </div>
       </section>
 

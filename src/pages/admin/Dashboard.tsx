@@ -183,14 +183,28 @@ function Dashboard() {
     if (saved) forgetRemoved(key)
   }
 
-  async function changeMedia(key: string, file: File, apply: (current: SiteContent, url: string) => SiteContent) {
+  async function removeUploadedFile(url: string) {
+    if (!url.includes('.blob.vercel-storage.com/') && !url.startsWith('/uploads/')) return
+    await fetch('/api/admin/upload', {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    }).catch(() => {})
+  }
+
+  async function changeMedia(key: string, file: File, previous: string, apply: (current: SiteContent, url: string) => SiteContent) {
     setUploading(key)
     setError('')
     try {
       const url = await uploadFile(file)
       const next = apply(content as SiteContent, url)
       setContent(next)
-      await persist(next, 'Photo or video saved. The live site is updated.')
+      const saved = await persist(next, 'Photo or video saved. The live site is updated.')
+      if (saved && previous && previous !== url) {
+        forgetRemoved(key)
+        await removeUploadedFile(previous)
+      }
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Upload failed.')
     } finally {
@@ -261,7 +275,7 @@ function Dashboard() {
     value,
     uploading: uploading === key,
     onChange: (url: string) => setContent(apply(content, url)),
-    onUpload: (file: File) => changeMedia(key, file, apply),
+    onUpload: (file: File) => changeMedia(key, file, value, apply),
     onRemove: () => clearMedia(key, value, apply),
     onReset: !value && (removed[key] || fallback) ? () => restoreMedia(key, fallback, apply) : undefined,
   })

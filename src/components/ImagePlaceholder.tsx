@@ -4,7 +4,7 @@ interface ImagePlaceholderProps {
   ratio?: string
   tone?: 'light' | 'dark'
   src?: string
-  fit?: 'cover' | 'contain'
+  fit?: 'cover' | 'contain' | 'natural'
 }
 
 const tones: Record<string, string> = {
@@ -20,6 +20,10 @@ function ImagePlaceholder({
   src,
   fit = 'cover',
 }: ImagePlaceholderProps) {
+  if (src && fit === 'natural') {
+    return <img src={src} alt={label} className={`block h-auto w-full rounded-[1rem] ${className}`} />
+  }
+
   if (src) {
     return (
       <div className={`${ratio} overflow-hidden rounded-[1rem] bg-neutral-900 ${className}`}>

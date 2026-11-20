@@ -1,7 +1,7 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, unlink, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { put } from '@vercel/blob'
+import { del, put } from '@vercel/blob'
 import { hasSession } from '../auth.ts'
 import { json, send, toRequest } from '../http.ts'
 import { blobToken } from '../store.ts'
@@ -40,6 +40,33 @@ export async function GET(request: Request) {
   if (!hasSession(request)) return json({ error: 'Unauthorized' }, 401)
   const mode = uploadMode()
   return json({ mode, blob: mode !== 'local' })
+}
+
+function uploadedPath(url: string) {
+  if (url.includes('.blob.vercel-storage.com/')) return 'blob'
+  if (url.startsWith('/uploads/') && !url.includes('..')) return 'local'
+  return ''
+}
+
+export async function DELETE(request: Request) {
+  if (!hasSession(request)) return json({ error: 'Unauthorized' }, 401)
+  const body = (await request.json().catch(() => null)) as { url?: unknown } | null
+  const url = typeof body?.url === 'string' ? body.url : ''
+  const kind = uploadedPath(url)
+  if (!kind) return json({ ok: true })
+
+  try {
+    if (kind === 'blob') {
+      const token = blobToken()
+      await del(url, token ? { token } : undefined)
+    } else {
+      const name = path.basename(url)
+      await unlink(path.join(process.cwd(), 'public', 'uploads', name))
+    }
+  } catch (error) {
+    console.error(error)
+  }
+  return json({ ok: true })
 }
 
 export async function POST(request: Request) {
@@ -85,6 +112,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
   if (req.method === 'POST') {
     await send(res, await POST(request))
+    return
+  }
+  if (req.method === 'DELETE') {
+    await send(res, await DELETE(request))
     return
   }
   await send(res, json({ error: 'Method not allowed' }, 405))

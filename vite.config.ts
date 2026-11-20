@@ -99,8 +99,9 @@ function cmsDevApi(): Plugin {
           const loaded = (await server.ssrLoadModule(file)) as {
             GET?: (request: Request) => Promise<Response>
             POST?: (request: Request) => Promise<Response>
+            DELETE?: (request: Request) => Promise<Response>
           }
-          const method = req.method === 'GET' ? loaded.GET : req.method === 'POST' ? loaded.POST : undefined
+          const method = req.method === 'GET' ? loaded.GET : req.method === 'POST' ? loaded.POST : req.method === 'DELETE' ? loaded.DELETE : undefined
           const response = method ? await method(request) : new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 })
           res.statusCode = response.status
           const cookies = response.headers.getSetCookie?.() ?? []

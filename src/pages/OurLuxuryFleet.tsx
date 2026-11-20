@@ -3,16 +3,8 @@ import SectionHeading from '../components/SectionHeading'
 import CTASection from '../components/CTASection'
 import Button from '../components/Button'
 import TermsNote from '../components/TermsNote'
-import { formatPrice, hourlyTerms, vehicleTitle, type VehicleId } from '../data/pricing'
+import { formatPrice, hourlyTerms, vehicleTitle } from '../data/pricing'
 import { useContent } from '../content/ContentProvider'
-
-const cardImagePosition: Record<VehicleId, string> = {
-  'e-class': 'object-center',
-  'v-class': 'object-center',
-  'range-rover': 'object-center',
-  's-class': 'object-center',
-  '5-series': 'object-center',
-}
 
 function OurLuxuryFleet() {
   const { fleet, vehicles, minimumHours } = useContent()
@@ -69,15 +61,9 @@ function OurLuxuryFleet() {
         <div className="mx-auto grid max-w-content grid-cols-1 items-stretch gap-5 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-3">
           {vehicles.map((vehicle) => (
             <article key={vehicle.id} className="flex h-full flex-col overflow-hidden rounded-[1rem] bg-[#141413]">
-              <div className="aspect-[3/2] overflow-hidden bg-[#141413]">
-                {vehicle.image && (
-                  <img
-                    src={vehicle.image}
-                    alt={vehicleTitle(vehicle)}
-                    className={`h-full w-full object-cover ${cardImagePosition[vehicle.id]}`}
-                  />
-                )}
-              </div>
+              {vehicle.image && (
+                <img src={vehicle.image} alt={vehicleTitle(vehicle)} className="block h-auto w-full" />
+              )}
               <div className="flex flex-1 flex-col p-5">
                 <h3 className="font-serif text-3xl leading-tight text-white">{vehicleTitle(vehicle)}</h3>
                 <p className="mt-1 text-sm text-neutral-400">{vehicle.seats}</p>

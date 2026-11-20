@@ -8,20 +8,16 @@ interface ServiceCardProps {
   imagePosition?: string
 }
 
-function ServiceCard({ slug, title, image, contain = false, imagePosition = 'object-center' }: ServiceCardProps) {
+function ServiceCard({ slug, title, image }: ServiceCardProps) {
   return (
     <Link
       to={`/chauffeur-services/${slug}`}
-      className="group relative block aspect-[3/2] w-[78vw] max-w-[340px] shrink-0 snap-start overflow-hidden rounded-[1rem] bg-neutral-900 sm:w-[300px] lg:w-[320px]"
+      className="group relative block w-[78vw] max-w-[340px] shrink-0 snap-start overflow-hidden rounded-[1rem] bg-neutral-900 sm:w-[300px] lg:w-[320px]"
     >
       {image ? (
-        <img
-          src={image}
-          alt=""
-          className={`absolute inset-0 h-full w-full ${imagePosition} ${contain ? 'object-contain' : 'object-cover'}`}
-        />
+        <img src={image} alt="" className="block h-auto w-full" />
       ) : (
-        <div className="absolute inset-0 bg-neutral-800" />
+        <div className="aspect-[3/2] bg-neutral-800" />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/10" />
       <div className="absolute inset-x-0 bottom-0 p-5">

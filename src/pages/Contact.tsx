@@ -119,7 +119,7 @@ function Contact() {
             <img
               src={contact.heroImage}
               alt=""
-              className="mt-10 h-56 w-full rounded-2xl object-cover object-[center_30%] sm:h-[420px]"
+              className="mt-10 block h-auto w-full rounded-2xl"
             />
           )}
         </div>
@@ -241,7 +241,7 @@ function Contact() {
             <h2 className="mt-3 max-w-[12ch] text-[2rem] font-medium leading-[1.08] tracking-tight sm:text-5xl">
               {contact.briefHeading}
             </h2>
-            {contact.briefImage && <img src={contact.briefImage} alt="" className="mt-6 h-56 w-full rounded-2xl object-cover object-center sm:h-72" />}
+            {contact.briefImage && <img src={contact.briefImage} alt="" className="mt-6 block h-auto w-full rounded-2xl" />}
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-neutral-300">{contact.briefText}</p>
             <ol className="mt-4">
               {contact.steps.map((step) => (

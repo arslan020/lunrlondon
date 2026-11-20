@@ -1,7 +1,6 @@
 import { Navigate, useParams } from 'react-router-dom'
 import PageHero from '../components/PageHero'
 import SectionHeading from '../components/SectionHeading'
-import ImagePlaceholder from '../components/ImagePlaceholder'
 import CTASection from '../components/CTASection'
 import GoldCtaBar from '../components/GoldCtaBar'
 import Button from '../components/Button'
@@ -148,12 +147,10 @@ function ServiceDetail() {
                   )}
                 </div>
                 {section.image && (
-                  <ImagePlaceholder
-                    label={section.heading}
+                  <img
                     src={section.image}
-                    fit={section.imageFit}
-                    ratio={section.imageRatio}
-                    className={`order-1 min-h-[220px] ${section.imageFirst ? '' : 'lg:order-2'}`}
+                    alt={section.heading}
+                    className={`order-1 block h-auto w-full rounded-[1rem] ${section.imageFirst ? '' : 'lg:order-2'}`}
                   />
                 )}
               </div>

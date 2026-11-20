@@ -58,7 +58,7 @@ function Home() {
               <Button to="/book">Book With Confidence</Button>
             </div>
           </div>
-          <ImagePlaceholder label={home.trustImageLabel} src={home.trustImage} className="order-1 min-h-[240px] lg:order-2" />
+          <ImagePlaceholder label={home.trustImageLabel} src={home.trustImage} fit="natural" className="order-1 lg:order-2" />
         </div>
       </section>
 
@@ -72,7 +72,7 @@ function Home() {
               </p>
             ))}
           </div>
-          <ImagePlaceholder label="Range Rover" src={home.respectImage} className="order-2 min-h-[240px] lg:order-1" />
+          <ImagePlaceholder label="Range Rover" src={home.respectImage} fit="natural" className="order-2 lg:order-1" />
         </div>
       </section>
 
@@ -133,7 +133,7 @@ function Home() {
             </ul>
             <p className="mt-5 leading-relaxed text-neutral-200">{home.fleetNote}</p>
           </div>
-          <ImagePlaceholder label="Range Rover" src={home.fleetImage} className="min-h-[240px]" />
+          <ImagePlaceholder label="Range Rover" src={home.fleetImage} fit="natural" />
         </div>
       </section>
 
