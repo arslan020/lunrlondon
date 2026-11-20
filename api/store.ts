@@ -85,6 +85,17 @@ async function readFileStore() {
   }
 }
 
+async function readPublishedContent() {
+  try {
+    const response = await fetch('https://lunrlondon.co.uk/api/content', { cache: 'no-store' })
+    if (!response.ok) return null
+    const data = (await response.json()) as { content?: unknown }
+    return asObject(data.content)
+  } catch {
+    return null
+  }
+}
+
 export async function readContent() {
   const sql = getSql()
   if (sql) {
@@ -93,6 +104,8 @@ export async function readContent() {
     return asObject(rows[0]?.data)
   }
   if (!canUseFileStore()) return null
+  const published = await readPublishedContent()
+  if (published) return published
   return readFileStore()
 }
 

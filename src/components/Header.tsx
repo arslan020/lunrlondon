@@ -97,6 +97,9 @@ function Header() {
           <NavLink to="/our-luxury-fleet" className={navLinkClass}>
             Our Fleet
           </NavLink>
+          <NavLink to="/destinations" className={navLinkClass}>
+            Destinations
+          </NavLink>
           <NavLink to="/faqs" className={navLinkClass}>
             FAQs
           </NavLink>
@@ -162,6 +165,9 @@ function Header() {
           </ul>
           <Link to="/our-luxury-fleet" onClick={() => setMobileOpen(false)} className="py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white">
             Our Fleet
+          </Link>
+          <Link to="/destinations" onClick={() => setMobileOpen(false)} className="py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white">
+            Destinations
           </Link>
           <Link to="/faqs" onClick={() => setMobileOpen(false)} className="py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white">
             FAQs

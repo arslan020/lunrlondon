@@ -4,10 +4,12 @@ import type { SiteContent } from './types'
 
 const ContentContext = createContext<SiteContent>(mergeContent(null))
 
-const savedContent = fetch('/api/content')
-  .then((response) => (response.ok ? response.json() : null))
-  .then((data: { content?: unknown } | null) => data?.content ?? null)
-  .catch(() => null)
+function loadSavedContent() {
+  return fetch('/api/content', { cache: 'no-store' })
+    .then((response) => (response.ok ? response.json() : null))
+    .then((data: { content?: unknown } | null) => data?.content ?? null)
+    .catch(() => null)
+}
 
 export function ContentProvider({ children }: { children: ReactNode }) {
   const [content, setContent] = useState<SiteContent>(() => mergeContent(null))
@@ -15,18 +17,26 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let ignore = false
-    savedContent.then((overlay) => {
-      if (ignore) return
-      setContent(mergeContent(overlay))
-      setReady(true)
-    })
+    const apply = () => {
+      loadSavedContent().then((overlay) => {
+        if (ignore) return
+        setContent(mergeContent(overlay))
+        setReady(true)
+      })
+    }
+    apply()
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') apply()
+    }
+    document.addEventListener('visibilitychange', onVisible)
     return () => {
       ignore = true
+      document.removeEventListener('visibilitychange', onVisible)
     }
   }, [])
 
   useEffect(() => {
-    document.title = `${content.site.brandName} | ${content.site.tagline}`
+    document.title = document.documentElement.dataset.pageTitle || `${content.site.brandName} | ${content.site.tagline}`
   }, [content])
 
   if (!ready) return <div className="min-h-screen bg-neutral-950" />

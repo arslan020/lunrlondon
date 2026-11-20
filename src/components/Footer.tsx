@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useContent } from '../content/ContentProvider'
+import { destinationRegions } from '../data/destinations'
 
 function Footer() {
   const { site: siteConfig, services, areas } = useContent()
@@ -34,8 +35,17 @@ function Footer() {
         </div>
 
         <div className="lg:pl-8">
-          <h3 className="mb-4 font-serif text-2xl text-brand-secondary">Areas</h3>
+          <h3 className="mb-4 font-serif text-2xl text-brand-secondary">
+            <Link to="/destinations" className="hover:text-brand-primary">Areas</Link>
+          </h3>
           <ul className="space-y-2 text-sm text-white">
+            {destinationRegions.map((region) => (
+              <li key={region.slug}>
+                <Link to={`/destinations/${region.slug}`} className="hover:text-brand-primary">
+                  {region.nav}
+                </Link>
+              </li>
+            ))}
             {areas.map((area) => (
               <li key={area}>{area}</li>
             ))}

@@ -8,6 +8,7 @@ import Faqs from './pages/Faqs'
 import Contact from './pages/Contact'
 import Book from './pages/Book'
 import PrivacyPolicy from './pages/PrivacyPolicy'
+import Destinations from './pages/Destinations'
 import NotFound from './pages/NotFound'
 import AdminLogin from './pages/admin/Login'
 import AdminDashboard from './pages/admin/Dashboard'
@@ -22,6 +23,8 @@ function App() {
         <Route path="chauffeur-services" element={<ChauffeurServices />} />
         <Route path="chauffeur-services/:slug" element={<ServiceDetail />} />
         <Route path="our-luxury-fleet" element={<OurLuxuryFleet />} />
+        <Route path="destinations" element={<Destinations />} />
+        <Route path="destinations/:region" element={<Destinations />} />
         <Route path="faqs" element={<Faqs />} />
         <Route path="contact" element={<Contact />} />
         <Route path="book" element={<Book />} />
