@@ -24,6 +24,13 @@ export const DEFAULT_CONTENT: SiteContent = {
   },
   areas: ['London', 'Heathrow', 'Gatwick', 'Luton', 'Stansted', 'London City', 'Farnborough'],
   minimumHours: 4,
+  destinations: {
+    heroImage: '',
+    unitedKingdomImage: '',
+    europeImage: '',
+    usaImage: '',
+    middleEastImage: '',
+  },
   home: {
     heroHeading: 'A Higher Standard of Chauffeuring. Around the Clock.',
     heroHighlight: 'Around the Clock',

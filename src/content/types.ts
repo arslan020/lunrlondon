@@ -115,11 +115,20 @@ export type PrivacyContent = {
   sections: PrivacySection[]
 }
 
+export type DestinationContent = {
+  heroImage: string
+  unitedKingdomImage: string
+  europeImage: string
+  usaImage: string
+  middleEastImage: string
+}
+
 export type SiteContent = {
   site: SiteSettings
   areas: string[]
   minimumHours: number
   home: HomeContent
+  destinations: DestinationContent
   servicesPage: PageIntro
   services: ServiceData[]
   fleet: FleetContent

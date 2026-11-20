@@ -5,6 +5,7 @@ import SectionHeading from '../components/SectionHeading'
 import CTASection from '../components/CTASection'
 import { useContent } from '../content/ContentProvider'
 import {
+  destinationHero,
   destinationRegions,
   furtherDestinations,
   globalDestinationDescription,
@@ -44,8 +45,10 @@ function CityList({ cities }: { cities: string[] }) {
 }
 
 function Destinations() {
+  const content = useContent()
   const { region: regionSlug } = useParams()
   const region = destinationRegions.find((item) => item.slug === regionSlug)
+  const heroImage = destinationHero(content, region?.slug)
 
   usePageMeta(
     region ? region.title : regionSlug ? '' : globalDestinationTitle,
@@ -62,7 +65,7 @@ function Destinations() {
           heading="Luxury London chauffeur services for international travellers"
           highlight="international travellers"
           subtext="A car in London for arrivals from abroad, and for the drive on to cities across the UK."
-          image="/images/airport-hero.jpg"
+          image={heroImage}
         />
 
         <section className="py-12 md:py-16">
@@ -117,7 +120,7 @@ function Destinations() {
 
   return (
     <>
-      <PageHero eyebrow="Destinations" heading={region.heading} highlight={region.highlight} subtext={region.intro} image={region.image} />
+      <PageHero eyebrow="Destinations" heading={region.heading} highlight={region.highlight} subtext={region.intro} image={heroImage} />
 
       <section className="py-12 md:py-16">
         <div className="mx-auto max-w-content px-4 sm:px-6">

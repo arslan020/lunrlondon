@@ -1,3 +1,5 @@
+import type { SiteContent } from '../content/types'
+
 export interface DestinationRegion {
   slug: string
   nav: string
@@ -7,7 +9,7 @@ export interface DestinationRegion {
   cities: string[]
   title: string
   description: string
-  image: string
+  imageKey: keyof SiteContent['destinations']
 }
 
 export const globalDestinationTitle = 'LUNR | Luxury London Chauffeur Services for International Travellers'
@@ -54,7 +56,7 @@ export const destinationRegions: DestinationRegion[] = [
     title: 'LUNR | UK Chauffeur Destinations',
     description:
       'London chauffeur journeys to major UK cities, including Birmingham, Manchester, Portsmouth, Bournemouth, Basingstoke and London itself.',
-    image: '/images/rr-manor-wide.jpg',
+    imageKey: 'unitedKingdomImage',
   },
   {
     slug: 'europe',
@@ -80,7 +82,7 @@ export const destinationRegions: DestinationRegion[] = [
     title: 'LUNR | European Travel Connections',
     description:
       'London chauffeur service for travellers arriving from Paris, Nice, Geneva, Zurich, Frankfurt, Munich, Madrid, Barcelona, Milan, Luxembourg, Copenhagen and Istanbul.',
-    image: '/images/s-class-palace.jpg',
+    imageKey: 'europeImage',
   },
   {
     slug: 'usa',
@@ -93,7 +95,7 @@ export const destinationRegions: DestinationRegion[] = [
     title: 'LUNR | USA Travel Connections',
     description:
       'London chauffeur service for travellers arriving from New York, Los Angeles, Miami and San Francisco.',
-    image: '/images/hourly-arrival.jpg',
+    imageKey: 'usaImage',
   },
   {
     slug: 'middle-east',
@@ -106,6 +108,25 @@ export const destinationRegions: DestinationRegion[] = [
     title: 'LUNR | Middle East Travel Connections',
     description:
       'London chauffeur service for travellers arriving from Dubai, Abu Dhabi, Riyadh, Jeddah, Dammam, Doha, Kuwait City, Muscat, Manama and Amman.',
-    image: '/images/s-class-airport.jpg',
+    imageKey: 'middleEastImage',
   },
 ]
+
+function serviceHero(content: SiteContent, slug: string) {
+  return content.services.find((service) => service.slug === slug)?.heroImage || ''
+}
+
+export function destinationHero(content: SiteContent, slug?: string) {
+  const saved = content.destinations
+  const current = {
+    heroImage: serviceHero(content, 'airport-transfer'),
+    unitedKingdomImage: content.home.fleetImage,
+    europeImage: serviceHero(content, 'as-directed'),
+    usaImage: content.home.trustImage,
+    middleEastImage: serviceHero(content, 'one-way-transfer'),
+  }
+  if (!slug) return saved.heroImage || current.heroImage
+  const region = destinationRegions.find((item) => item.slug === slug)
+  if (!region) return ''
+  return saved[region.imageKey] || current[region.imageKey]
+}

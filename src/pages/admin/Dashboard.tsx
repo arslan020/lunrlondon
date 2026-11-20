@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { upload } from '@vercel/blob/client'
 import { DEFAULT_CONTENT } from '../../content/defaults'
+import { destinationHero } from '../../data/destinations'
 import { mergeContent } from '../../content/merge'
 import type { SiteContent } from '../../content/types'
 import type { VehicleId } from '../../data/pricing'
 import type { ServiceFeatureSection } from '../../types'
 import { Area, Field, Lines, MediaField, Section } from './fields'
 
-const PAGE_TABS = ['Site', 'Home', 'Services', 'Fleet', 'Prices', 'FAQs', 'Reviews', 'Contact', 'Book', 'Privacy'] as const
+const PAGE_TABS = ['Site', 'Home', 'Services', 'Destinations', 'Fleet', 'Prices', 'FAQs', 'Reviews', 'Contact', 'Book', 'Privacy'] as const
 
 function serviceTabId(slug: string) {
   return `service:${slug}`
@@ -218,9 +219,9 @@ function Dashboard() {
 
   const service = content.services.find((item) => serviceTabId(item.slug) === tab)
   const tabs = [
-    ...PAGE_TABS.slice(0, 3).map((id) => ({ id, label: id })),
+    ...PAGE_TABS.slice(0, 4).map((id) => ({ id, label: id })),
     ...content.services.map((item) => ({ id: serviceTabId(item.slug), label: item.navLabel })),
-    ...PAGE_TABS.slice(3).map((id) => ({ id, label: id })),
+    ...PAGE_TABS.slice(4).map((id) => ({ id, label: id })),
   ]
   const updateService = (patch: Partial<SiteContent['services'][number]>) => {
     if (!service) return
@@ -446,6 +447,37 @@ function Dashboard() {
               Add section
             </button>
           </>
+        )}
+
+        {tab === 'Destinations' && (
+          <Section title="Destination heroes">
+            <p className="text-sm text-white/60">These pages use the current site photos until you upload a replacement here.</p>
+            {(
+              [
+                ['dest-hero', 'All destinations', 'heroImage'],
+                ['dest-uk', 'United Kingdom', 'unitedKingdomImage'],
+                ['dest-europe', 'Europe', 'europeImage'],
+                ['dest-usa', 'USA', 'usaImage'],
+                ['dest-middle-east', 'Middle East', 'middleEastImage'],
+              ] as const
+            ).map(([key, label, field]) => {
+              const saved = content.destinations[field]
+              const slug = field === 'heroImage' ? undefined : field === 'unitedKingdomImage' ? 'united-kingdom' : field === 'europeImage' ? 'europe' : field === 'usaImage' ? 'usa' : 'middle-east'
+              return (
+                <MediaField
+                  key={key}
+                  label={label}
+                  accept={imageAccept}
+                  value={saved}
+                  preview={destinationHero(content, slug)}
+                  uploading={uploading === key}
+                  onChange={(url) => setContent({ ...content, destinations: { ...content.destinations, [field]: url } })}
+                  onUpload={(file) => changeMedia(key, file, saved, (current, url) => ({ ...current, destinations: { ...current.destinations, [field]: url } }))}
+                  onRemove={saved ? () => clearMedia(key, saved, (current, url) => ({ ...current, destinations: { ...current.destinations, [field]: url } })) : undefined}
+                />
+              )
+            })}
+          </Section>
         )}
 
         {tab === 'Fleet' && (

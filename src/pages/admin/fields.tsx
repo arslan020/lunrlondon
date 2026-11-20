@@ -29,6 +29,7 @@ export function Lines({ label, value, onChange, rows = 4 }: { label: string; val
 export function MediaField({
   label,
   value,
+  preview,
   accept,
   uploading,
   onUpload,
@@ -38,6 +39,7 @@ export function MediaField({
 }: {
   label: string
   value: string
+  preview?: string
   accept: string
   uploading: boolean
   onUpload: (file: File) => void
@@ -45,15 +47,16 @@ export function MediaField({
   onRemove?: () => void
   onReset?: () => void
 }) {
-  const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(value) || value.startsWith('data:video')
+  const shown = preview || value
+  const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(shown) || shown.startsWith('data:video')
   return (
     <div className="rounded-xl border border-white/10 bg-black/30 p-3">
       <p className="text-sm text-white/80">{label}</p>
-      {value &&
+      {shown &&
         (isVideo ? (
-          <video src={value} className="mt-2 max-h-40 w-full rounded-lg bg-black object-contain" muted controls />
+          <video src={shown} className="mt-2 max-h-40 w-full rounded-lg bg-black object-contain" muted controls />
         ) : (
-          <img src={value} alt="" className="mt-2 max-h-40 w-full rounded-lg bg-black object-contain" />
+          <img src={shown} alt="" className="mt-2 max-h-40 w-full rounded-lg bg-black object-contain" />
         ))}
       <input className={inputClass} value={value} onChange={(event) => onChange(event.target.value)} placeholder="/images/photo.jpg or a full URL" />
       <div className="mt-2 flex flex-wrap gap-2">
