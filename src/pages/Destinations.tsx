@@ -72,7 +72,7 @@ function Destinations() {
           <div className="mx-auto max-w-content px-4 sm:px-6">
             <SectionHeading heading="Where the journeys run" highlight="journeys" />
             <p className="mt-6 max-w-3xl leading-relaxed text-neutral-200">
-              LUNR is a London chauffeur service. We meet international arrivals at the airport or a London address, and we drive to the UK cities listed here. The car is in London. The fare is confirmed before you travel.
+              LUNR meets international arrivals at the airport or their address. The car takes them to London or anywhere in the UK. The fare is confirmed before you travel.
             </p>
             <div className="mt-10 grid gap-4 sm:grid-cols-2">
               {destinationRegions.map((item) => (
@@ -94,7 +94,7 @@ function Destinations() {
           <div className="mx-auto max-w-content px-4 sm:px-6">
             <SectionHeading heading="Further cities" highlight="Further" />
             <p className="mt-6 max-w-3xl leading-relaxed text-neutral-200">
-              Travellers from these cities are met in London as well. The onward journey starts here.
+              Travellers from these cities are met when they land. The car takes them to London or anywhere in the UK.
             </p>
             <div className="mt-8">
               <CityList cities={furtherDestinations} />
@@ -133,7 +133,7 @@ function Destinations() {
           <p className="mt-10 max-w-3xl leading-relaxed text-neutral-200">
             {region.slug === 'united-kingdom'
               ? 'These journeys are driven from London. Hourly hire covers the day, and a one-way transfer is priced from the route.'
-              : 'The collection is in London, after the flight or from your address. We do not keep cars in these cities.'}
+              : 'We collect you after the flight, or from your address, and take you to London or anywhere in the UK. We do not keep cars in these cities.'}
           </p>
           <Link to="/chauffeur-services/airport-transfer" className="mt-4 inline-block text-sm font-semibold text-brand-primary underline">
             International airport transfers

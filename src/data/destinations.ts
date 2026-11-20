@@ -64,7 +64,7 @@ export const destinationRegions: DestinationRegion[] = [
     heading: 'European travel connections',
     highlight: 'European',
     intro:
-      'These are European cities our clients fly in from, including Paris, Geneva, Zurich and Copenhagen in Denmark. The car is in London. We meet the arrival at the airport or the hotel, then drive on from there.',
+      'These are European cities our clients fly in from, including Paris, Geneva, Zurich and Copenhagen in Denmark. We meet the arrival at the airport or the hotel, then drive on, whether that is to London or anywhere in the UK.',
     cities: [
       'Paris',
       'Nice',
@@ -90,7 +90,7 @@ export const destinationRegions: DestinationRegion[] = [
     heading: 'USA travel connections',
     highlight: 'USA',
     intro:
-      'For travellers coming into London from the United States. We collect you after you land, or from your London address, and take you on by car.',
+      'For travellers coming from the United States. We collect you after you land, or from your address, and take you on by car, whether that is to London or anywhere in the UK.',
     cities: ['New York', 'Los Angeles', 'Miami', 'San Francisco'],
     title: 'LUNR | USA Travel Connections',
     description:
@@ -103,7 +103,7 @@ export const destinationRegions: DestinationRegion[] = [
     heading: 'Middle East travel connections',
     highlight: 'Middle East',
     intro:
-      'For travellers coming into London from the United Arab Emirates, Saudi Arabia and the wider Middle East. We meet the flight in London. The onward journey is by chauffeur from there.',
+      'For travellers coming from the United Arab Emirates, Saudi Arabia and the wider Middle East. We meet the flight and take you on by car, whether that is to London or anywhere in the UK.',
     cities: ['Dubai', 'Abu Dhabi', 'Riyadh', 'Jeddah', 'Dammam', 'Doha', 'Kuwait City', 'Muscat', 'Manama', 'Amman'],
     title: 'LUNR | Middle East Travel Connections',
     description:
